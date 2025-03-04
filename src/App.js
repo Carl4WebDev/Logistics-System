@@ -8,6 +8,7 @@ import OrdersPage from "./pages/OrdersPage";
 import FleetPage from './pages/FleetPage';
 import ReportPage from './pages/ReportPage';
 import DocumentPage from './pages/DocumentPage';
+import ShipmentsPage from './pages/ShipmentsPage';
 
 
 const Layout = ({ children }) => (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/fleetlist" element={<FleetPage />} />
         <Route path="/reportchart" element={<ReportPage />} />
         <Route path="/documentuploader" element={<DocumentPage />} />
+        <Route path="/shipments" element={<ShipmentsPage />} />
       </Routes>
     </Layout>
   );

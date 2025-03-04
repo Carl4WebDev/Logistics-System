@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 
-const FleetList = () => {
-  // Sample fleet data
-  const [fleet, setFleet] = useState([
-    { id: 1, vehicle: "Truck A", driver: "John Doe", status: "Available" },
-    { id: 2, vehicle: "Van B", driver: "Jane Smith", status: "In Transit" },
+const ShipmentsPage = () => {
+  // Sample shipment data
+  const [shipments, setShipments] = useState([
+    { id: 1, recipient: "Alice Johnson", tracking: "TRK12345", status: "Pending" },
+    { id: 2, recipient: "Bob Smith", tracking: "TRK67890", status: "Shipped" },
   ]);
 
   // State for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [formData, setFormData] = useState({ driver: "", status: "" });
+  const [formData, setFormData] = useState({ recipient: "", tracking: "", status: "" });
 
-  // Open modal for editing a specific driver
+  // Open modal for editing a specific shipment
   const handleEdit = (index) => {
     setEditingIndex(index);
-    setFormData({ driver: fleet[index].driver, status: fleet[index].status });
+    setFormData({
+      recipient: shipments[index].recipient,
+      tracking: shipments[index].tracking,
+      status: shipments[index].status,
+    });
     setIsModalOpen(true);
   };
 
@@ -24,38 +28,39 @@ const FleetList = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Save updated driver and status
+  // Save updated shipment details
   const handleSave = () => {
-    const updatedFleet = [...fleet];
-    updatedFleet[editingIndex] = {
-      ...updatedFleet[editingIndex],
-      driver: formData.driver,
+    const updatedShipments = [...shipments];
+    updatedShipments[editingIndex] = {
+      ...updatedShipments[editingIndex],
+      recipient: formData.recipient,
+      tracking: formData.tracking,
       status: formData.status,
     };
-    setFleet(updatedFleet);
+    setShipments(updatedShipments);
     setIsModalOpen(false);
   };
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Fleet Management</h2>
+      <h2 className="text-2xl font-bold mb-4">Shipments Management</h2>
 
-      {/* Fleet Table */}
+      {/* Shipments Table */}
       <table className="min-w-full bg-white border">
         <thead>
           <tr className="bg-gray-200">
-            <th className="p-3 text-left">Vehicle</th>
-            <th className="p-3 text-left">Driver</th>
+            <th className="p-3 text-left">Recipient</th>
+            <th className="p-3 text-left">Tracking Number</th>
             <th className="p-3 text-left">Status</th>
             <th className="p-3 text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {fleet.map((vehicle, index) => (
-            <tr key={vehicle.id} className="border-b">
-              <td className="p-3">{vehicle.vehicle}</td>
-              <td className="p-3">{vehicle.driver || "No Driver Assigned"}</td>
-              <td className="p-3">{vehicle.status}</td>
+          {shipments.map((shipment, index) => (
+            <tr key={shipment.id} className="border-b">
+              <td className="p-3">{shipment.recipient}</td>
+              <td className="p-3">{shipment.tracking}</td>
+              <td className="p-3">{shipment.status}</td>
               <td className="p-3">
                 <button
                   className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
@@ -69,16 +74,24 @@ const FleetList = () => {
         </tbody>
       </table>
 
-      {/* Modal for Editing Driver & Status */}
+      {/* Modal for Editing Shipment Details */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Edit Driver & Status</h2>
-            <label className="block mb-2">Driver Name:</label>
+            <h2 className="text-xl font-bold mb-4">Edit Shipment</h2>
+            <label className="block mb-2">Recipient Name:</label>
             <input
               type="text"
-              name="driver"
-              value={formData.driver}
+              name="recipient"
+              value={formData.recipient}
+              onChange={handleChange}
+              className="border p-2 w-full mb-3"
+            />
+            <label className="block mb-2">Tracking Number:</label>
+            <input
+              type="text"
+              name="tracking"
+              value={formData.tracking}
               onChange={handleChange}
               className="border p-2 w-full mb-3"
             />
@@ -89,9 +102,9 @@ const FleetList = () => {
               onChange={handleChange}
               className="border p-2 w-full mb-4"
             >
-              <option value="Available">Available</option>
-              <option value="In Transit">In Transit</option>
-              <option value="Under Maintenance">Under Maintenance</option>
+              <option value="Pending">Pending</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Delivered">Delivered</option>
             </select>
             <div className="flex justify-end">
               <button className="bg-green-500 text-white px-4 py-2 rounded mr-2" onClick={handleSave}>
@@ -108,4 +121,4 @@ const FleetList = () => {
   );
 };
 
-export default FleetList;
+export default ShipmentsPage;

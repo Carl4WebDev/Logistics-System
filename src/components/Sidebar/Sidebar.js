@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, Home, Truck, List, BarChart2, Settings } from "lucide-react";
+import { Menu, X, Home, Truck, List, BarChart2, Settings, ShipIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
@@ -60,6 +60,16 @@ export default function Sidebar() {
               >
               <BarChart2 className="w-5 h-5 ml-5" />
               {isOpen && <span className="ml-2">Reports & Analytics</span>}
+              </NavLink>
+            </li>
+            <li>
+
+              <NavLink
+                to="/shipments"
+                className={"flex items-center  hover:bg-gray-800 cursor-pointer"}
+              >
+              <ShipIcon className="w-5 h-5 ml-5" />
+              {isOpen && <span className="ml-2">Shipments</span>}
               </NavLink>
             </li>
             <li className="flex items-center  hover:bg-gray-800 cursor-pointer">

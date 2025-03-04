@@ -1,44 +1,36 @@
-import { useState } from "react";
 
-const OrderTable = () => {
-  // Sample order data
-  const [orders] = useState([
-    { id: "ORD001", customer: "John Doe", status: "Pending", total: "$150.00" },
-    { id: "ORD002", customer: "Jane Smith", status: "Shipped", total: "$200.00" },
-    { id: "ORD003", customer: "Mike Johnson", status: "Delivered", total: "$100.00" },
-  ]);
-
+const OrdersTable = ({ orders, onCreateShipment }) => {
   return (
-    <div className="overflow-x-auto bg-white shadow-md rounded-lg p-4">
-      <h2 className="text-xl font-semibold mb-4">Order List</h2>
-      <table className="min-w-full border-collapse border border-gray-200">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="border border-gray-300 px-4 py-2 text-left">Order ID</th>
-            <th className="border border-gray-300 px-4 py-2 text-left">Customer</th>
-            <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
-            <th className="border border-gray-300 px-4 py-2 text-left">Total</th>
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white shadow-md rounded-lg">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="p-3 text-left">Order ID</th>
+            <th className="p-3 text-left">Customer Name</th>
+            <th className="p-3 text-left">Address</th>
+            <th className="p-3 text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-100">
-                <td className="border border-gray-300 px-4 py-2">{order.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{order.customer}</td>
-                <td className="border border-gray-300 px-4 py-2">{order.status}</td>
-                <td className="border border-gray-300 px-4 py-2">{order.total}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center py-4">No orders found</td>
+          {orders.map((order) => (
+            <tr key={order.id} className="border-b">
+              <td className="p-3">{order.id}</td>
+              <td className="p-3">{order.customer}</td>
+              <td className="p-3">{order.address}</td>
+              <td className="p-3">
+                <button
+                  onClick={() => onCreateShipment(order)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                >
+                  Create Shipment
+                </button>
+              </td>
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
     </div>
   );
 };
 
-export default OrderTable;
+export default OrdersTable;
