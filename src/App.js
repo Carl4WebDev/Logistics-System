@@ -16,7 +16,7 @@ const Layout = ({ children }) => (
     <Sidebar />
     <div className="flex-1">
       <Header />
-      <main className="h-screen mt-10 flex justify-center ">{children}</main>
+      <main className="h-screen mt-20 flex justify-center ">{children}</main>
       <Footer />
     </div>
   </div>
