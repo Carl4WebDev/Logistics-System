@@ -55,7 +55,7 @@ export default function Sidebar() {
               {logisticsOpen && (
                 <ul className="ml-2 space-y-1">
                   <NavItem to="/summary" icon={<Folder className="w-4 h-4" />}  text="Summary" isOpen={isOpen} />
-                  <NavItem to="/shipments" icon={<Package  className="w-4 h-4" />}  text="Shipments" isOpen={isOpen} />
+                  <NavItem to="/shipment" icon={<Package  className="w-4 h-4" />}  text="Shipments" isOpen={isOpen} />
                   <NavItem to="/Vehicle" icon={<TruckIcon className="w-4 h-4" />}  text="Vehicle" isOpen={isOpen} />
                   <NavItem to="/Report" icon={<ClipboardList className="w-4 h-4" />}  text="Report" isOpen={isOpen} />
                 </ul>
@@ -78,7 +78,7 @@ export default function Sidebar() {
               {userOpen && (
                 <ul className="space-y-1 ml-2">
                   <NavItem to="/fleetlist"  icon={<Users2Icon className="w-4 h-4" />} text="Employee" isOpen={isOpen} />
-                  <NavItem to="/shipments" icon={<IdCard className="w-4 h-4" />} text="Driver"  isOpen={isOpen} />
+                  <NavItem to="/shipment" icon={<IdCard className="w-4 h-4" />} text="Driver"  isOpen={isOpen} />
                 </ul>
               )}
             </li>

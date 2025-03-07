@@ -8,6 +8,7 @@ const ShipmentsPage = () => {
   ]);
 
   // State for modal and form
+  const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -26,11 +27,10 @@ const ShipmentsPage = () => {
     setIsModalOpen(true);
   };
 
-  // Handle form change
+  // Handle form input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
   // Save new or edited shipment
   const handleSave = () => {
     if (isEditing) {
@@ -43,6 +43,13 @@ const ShipmentsPage = () => {
     setIsModalOpen(false);
   };
 
+  // Filter shipments based on search term
+  const filteredShipments = shipments.filter((shipment) =>
+    shipment.recipient.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    shipment.tracking.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
       <div className="flex justify-between items-center mb-4">
@@ -52,6 +59,14 @@ const ShipmentsPage = () => {
         </button>
       </div>
 
+      {/* Search Bar (Full Width) */}
+      <input
+        type="text"
+        placeholder="Search shipments..."
+        className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       {/* Desktop Table View */}
       <div className="overflow-x-auto hidden md:block">
         <table className="min-w-full bg-white border">
@@ -69,7 +84,7 @@ const ShipmentsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {shipments.map((shipment, index) => (
+            {filteredShipments.map((shipment, index) => (
               <tr key={shipment.id} className="border-b">
                 <td className="p-3">{shipment.recipient}</td>
                 <td className="p-3">{shipment.tracking}</td>
@@ -92,7 +107,7 @@ const ShipmentsPage = () => {
 
       {/* Mobile View - Column Format */}
       <div className="md:hidden">
-        {shipments.map((shipment, index) => (
+        {filteredShipments.map((shipment, index) => (
           <div key={shipment.id} className="border p-4 mb-4 bg-white rounded-lg shadow">
             <p><strong>Recipient:</strong> {shipment.recipient}</p>
             <p><strong>Tracking Number:</strong> {shipment.tracking}</p>
@@ -112,47 +127,58 @@ const ShipmentsPage = () => {
       {/* Modal for Creating or Editing Shipment */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-5">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">
+          <div className="bg-white p-5 rounded-lg shadow-lg w-full md:w-[80%] lg:w-[60%] max-w-2xl max-h-[80vh] overflow-y-auto">
+            
+            {/* Modal Title */}
+            <h2 className="text-lg font-semibold mb-3 sticky top-0 bg-white py-3 z-10">
               {isEditing ? "Edit Shipment" : "Create New Shipment"}
             </h2>
 
-            {["recipient", "tracking", "dtrs", "dispatchDate", "manifest", "ticketRoute", "driverName"].map((field) => (
-              <div key={field}>
-                <label className="block mb-2 capitalize">{field.replace(/([A-Z])/g, ' $1')}:</label>
-                <input
-                  type="text"
-                  name={field}
-                  value={formData[field]}
+            {/* Grid Layout for Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {["recipient", "tracking", "dtrs", "dispatchDate", "manifest", "ticketRoute", "driverName"].map((field) => (
+                <div key={field}>
+                  <label className="block text-sm mb-1 capitalize">{field.replace(/([A-Z])/g, ' $1')}:</label>
+                  <input
+                    type="text"
+                    name={field}
+                    value={formData[field]}
+                    onChange={handleChange}
+                    className="border p-2 h-10 w-full text-sm"
+                  />
+                </div>
+              ))}
+
+              {/* Status Field - Full Width */}
+              <div className="md:col-span-2">
+                <label className="block text-sm mb-1">Status:</label>
+                <select
+                  name="status"
+                  value={formData.status}
                   onChange={handleChange}
-                  className="border p-2 w-full mb-3"
-                />
+                  className="border p-2 h-10 w-full text-sm"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
               </div>
-            ))}
+            </div>
 
-            <label className="block mb-2">Status:</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="border p-2 w-full mb-4"
-            >
-              <option value="Pending">Pending</option>
-              <option value="Shipped">Shipped</option>
-              <option value="Delivered">Delivered</option>
-            </select>
-
-            <div className="flex justify-end">
-              <button className="bg-green-500 text-white px-4 py-2 rounded mr-2" onClick={handleSave}>
+            {/* Sticky Footer Buttons */}
+            <div className="sticky bottom-0 bg-white py-3 mt-3 flex justify-end border-t">
+              <button className="bg-green-500 text-white px-4 py-2 rounded text-sm mr-2" onClick={handleSave}>
                 Save
               </button>
-              <button className="bg-gray-400 text-white px-4 py-2 rounded" onClick={() => setIsModalOpen(false)}>
+              <button className="bg-gray-400 text-white px-4 py-2 rounded text-sm" onClick={() => setIsModalOpen(false)}>
                 Cancel
               </button>
             </div>
           </div>
         </div>
       )}
+
+
 
     </div>
   );

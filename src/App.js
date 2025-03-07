@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
 import DashboardPage from './pages/DashboardPage';
-import Footer from './components/Foooter/Footer'
+// import Footer from './components/Foooter/Footer'
 import OrdersPage from "./pages/OrdersPage";
 import FleetPage from './pages/FleetPage';
 import ReportPage from './pages/ReportPage';
@@ -19,11 +19,11 @@ const Layout = ({ children }) => (
         <Header />
       </div>
       <div className='row'>
-        <main className="h-screen mt-20 flex justify-center ">{children}</main>
+        <main className="h-auto mt-20 flex justify-center ">{children}</main>
       </div>
-      <div className='row'>
+      {/* <div className='row'>
         <Footer />
-      </div>
+      </div> */}
     </div>
   </div>
 );
@@ -37,7 +37,7 @@ function App() {
         <Route path="/fleetlist" element={<FleetPage />} />
         <Route path="/reportchart" element={<ReportPage />} />
         <Route path="/documentuploader" element={<DocumentPage />} />
-        <Route path="/shipments" element={<ShipmentsPage />} />
+        <Route path="/shipment" element={<ShipmentsPage />} />
       </Routes>
     </Layout>
   );

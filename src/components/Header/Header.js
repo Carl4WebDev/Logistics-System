@@ -19,7 +19,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-gray-900 text-white p-4 flex justify-between items-center fixed w-full top-0 z-50">
+    <nav className="bg-gray-900 text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
       {/* Left Side: Logo */}
       <div className="text-2xl font-bold">LogiTrack</div>
 
