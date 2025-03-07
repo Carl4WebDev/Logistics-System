@@ -111,11 +111,12 @@ const ShipmentsPage = () => {
 
       {/* Modal for Creating or Editing Shipment */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-5">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">
               {isEditing ? "Edit Shipment" : "Create New Shipment"}
             </h2>
+
             {["recipient", "tracking", "dtrs", "dispatchDate", "manifest", "ticketRoute", "driverName"].map((field) => (
               <div key={field}>
                 <label className="block mb-2 capitalize">{field.replace(/([A-Z])/g, ' $1')}:</label>
@@ -128,6 +129,7 @@ const ShipmentsPage = () => {
                 />
               </div>
             ))}
+
             <label className="block mb-2">Status:</label>
             <select
               name="status"
@@ -139,6 +141,7 @@ const ShipmentsPage = () => {
               <option value="Shipped">Shipped</option>
               <option value="Delivered">Delivered</option>
             </select>
+
             <div className="flex justify-end">
               <button className="bg-green-500 text-white px-4 py-2 rounded mr-2" onClick={handleSave}>
                 Save
@@ -150,6 +153,7 @@ const ShipmentsPage = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

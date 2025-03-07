@@ -14,10 +14,16 @@ import ShipmentsPage from './pages/ShipmentsPage';
 const Layout = ({ children }) => (
   <div className="flex min-h-screen justify-center align-middle">
     <Sidebar />
-    <div className="flex-1">
-      <Header />
-      <main className="h-screen mt-20 flex justify-center ">{children}</main>
-      <Footer />
+    <div className="row flex-1">
+      <div className='row'>
+        <Header />
+      </div>
+      <div className='row'>
+        <main className="h-screen mt-20 flex justify-center ">{children}</main>
+      </div>
+      <div className='row'>
+        <Footer />
+      </div>
     </div>
   </div>
 );
