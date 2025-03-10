@@ -9,6 +9,7 @@ import FleetPage from "./pages/FleetPage";
 import ReportPage from "./pages/ReportPage";
 import DocumentPage from "./pages/DocumentPage";
 import ShipmentsPage from "./pages/ShipmentsPage";
+import SummaryPage from "./pages/SummaryPage";
 
 const Layout = ({ children }) => (
   <div className="flex min-h-screen justify-center align-middle">
@@ -18,7 +19,7 @@ const Layout = ({ children }) => (
         <Header />
       </div>
       <div className="row">
-        <main className="h-auto mt-20 flex justify-center ">{children}</main>
+        <main className="h-auto mt-20 flex justify-center">{children}</main>
       </div>
       {/* <div className='row'>
         <Footer />
@@ -37,6 +38,7 @@ function App() {
         <Route path="/report" element={<ReportPage />} />
         <Route path="/documentuploader" element={<DocumentPage />} />
         <Route path="/shipment" element={<ShipmentsPage />} />
+        <Route path="/summary" element={<SummaryPage />} />
       </Routes>
     </Layout>
   );

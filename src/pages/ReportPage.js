@@ -6,7 +6,7 @@ const ReportPage = () => {
   const tableData = [
     {
       id: 1,
-      name: "Sample Item 1",
+      name: "report Item 1",
       description: "Description of item 1",
       createdAt: "2025-03-07",
       createdBy: "Carl",
@@ -17,7 +17,7 @@ const ReportPage = () => {
     },
     {
       id: 2,
-      name: "Sample Item 2",
+      name: "report Item 2",
       description: "Description of item 2",
       createdAt: "2025-03-06",
       createdBy: "Ivan",
@@ -34,7 +34,7 @@ const ReportPage = () => {
     console.log(`Downloading file from: ${fileUrl}`);
   const handleEdit = (id) => console.log(`Editing item with ID: ${id}`);
   const handleDelete = (id) => console.log(`Deleting item with ID: ${id}`);
-  const handleCreateNew = () => console.log("Creating new shipment...");
+  const handleCreateNew = () => console.log("Creating new report...");
   const handleEditPage = () => console.log("Editing shipment page...");
 
   return (

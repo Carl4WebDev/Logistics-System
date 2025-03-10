@@ -1,5 +1,21 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Home, Truck, BarChart2, TruckIcon, Package, ClipboardList, ChevronDown, ChevronRight, User2Icon, Warehouse ,Users2Icon, Folder, IdCard } from "lucide-react";
+import {
+  Menu,
+  X,
+  Home,
+  Truck,
+  BarChart2,
+  TruckIcon,
+  Package,
+  ClipboardList,
+  ChevronDown,
+  ChevronRight,
+  User2Icon,
+  Warehouse,
+  Users2Icon,
+  Folder,
+  IdCard,
+} from "lucide-react";
 
 import NavItem from "./NavItem";
 
@@ -28,8 +44,13 @@ export default function Sidebar() {
         } bg-gray-900 h-auto text-white transition-all duration-300 ease-in-out fixed p-2`}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h1 className={`text-2xl font-bold ${!isOpen && "hidden"}`}>Logistics</h1>
-          <button onClick={() => setIsOpen(!isOpen)} className="p-2 focus:outline-none">
+          <h1 className={`text-2xl font-bold ${!isOpen && "hidden"}`}>
+            Logistics
+          </h1>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 focus:outline-none"
+          >
             {isOpen ? <X size={16} /> : <Menu size={16} />}
           </button>
         </div>
@@ -38,7 +59,7 @@ export default function Sidebar() {
         <nav className="mt-4">
           <ul className="space-y-2">
             <NavItem to="/" icon={<Home />} text="Dashboard" isOpen={isOpen} />
-            
+
             {/* Logistic Management Dropdown */}
             <li>
               <div
@@ -46,23 +67,48 @@ export default function Sidebar() {
                 onClick={() => setLogisticsOpen(!logisticsOpen)}
               >
                 <div className="flex items-center">
-                  <Warehouse  className="w-5 h-5 ml-3" />
+                  <Warehouse className="w-5 h-5 ml-3" />
                   {isOpen && <span className="ml-2">Logistic Management</span>}
                 </div>
-                {isOpen && (logisticsOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                {isOpen &&
+                  (logisticsOpen ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  ))}
               </div>
 
               {logisticsOpen && (
                 <ul className="ml-2 space-y-1">
-                  <NavItem to="/summary" icon={<Folder className="w-4 h-4" />}  text="Summary" isOpen={isOpen} />
-                  <NavItem to="/shipment" icon={<Package  className="w-4 h-4" />}  text="Shipments" isOpen={isOpen} />
-                  <NavItem to="/Vehicle" icon={<TruckIcon className="w-4 h-4" />}  text="Vehicle" isOpen={isOpen} />
-                  <NavItem to="/Report" icon={<ClipboardList className="w-4 h-4" />}  text="Report" isOpen={isOpen} />
+                  <NavItem
+                    to="/summary"
+                    icon={<Folder className="w-4 h-4" />}
+                    text="Summary"
+                    isOpen={isOpen}
+                  />
+                  <NavItem
+                    to="/shipment"
+                    icon={<Package className="w-4 h-4" />}
+                    text="Shipments"
+                    isOpen={isOpen}
+                  />
+                  <NavItem
+                    to="/Vehicle"
+                    icon={<TruckIcon className="w-4 h-4" />}
+                    text="Vehicle"
+                    isOpen={isOpen}
+                  />
+                  <NavItem
+                    to="/Report"
+                    icon={<ClipboardList className="w-4 h-4" />}
+                    text="Report"
+                    isOpen={isOpen}
+                  />
                 </ul>
               )}
             </li>
 
-              {/* User Management Dropdown */}
+            {/* User Management Dropdown */}
             <li>
               <div
                 className={`flex items-center justify-between hover:bg-gray-800 p-2 rounded-md`}
@@ -72,17 +118,31 @@ export default function Sidebar() {
                   <User2Icon className="w-5 h-5 ml-3" />
                   {isOpen && <span className="ml-2">User Management</span>}
                 </div>
-                {isOpen && (userOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                {isOpen &&
+                  (userOpen ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  ))}
               </div>
 
               {userOpen && (
                 <ul className="space-y-1 ml-2">
-                  <NavItem to="/fleetlist"  icon={<Users2Icon className="w-4 h-4" />} text="Employee" isOpen={isOpen} />
-                  <NavItem to="/shipment" icon={<IdCard className="w-4 h-4" />} text="Driver"  isOpen={isOpen} />
+                  <NavItem
+                    to="/fleetlist"
+                    icon={<Users2Icon className="w-4 h-4" />}
+                    text="Employee"
+                    isOpen={isOpen}
+                  />
+                  <NavItem
+                    to="/shipment"
+                    icon={<IdCard className="w-4 h-4" />}
+                    text="Driver"
+                    isOpen={isOpen}
+                  />
                 </ul>
               )}
             </li>
-            
           </ul>
         </nav>
       </div>
