@@ -3,24 +3,30 @@ import * as XLSX from "xlsx";
 
 const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    createdBy: "",
-    status: "Active",
-  });
-  const [editData, setEditData] = useState(null);
 
-  // Filter data based on search term
-  const filteredData = data.filter((row) =>
-    Object.values(row)
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  // Filter data based on search term and date range
+  const filteredData = data.filter((row) => {
+    const matchesSearch = Object.values(row)
       .join(" ")
       .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+      .includes(searchTerm.toLowerCase());
 
+    const createdAt = row.createdAt ? new Date(row.createdAt) : null;
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    const matchesDateRange =
+      (!start || (createdAt && createdAt >= start)) &&
+      (!end || (createdAt && createdAt <= end));
+
+    return matchesSearch && matchesDateRange;
+  });
+
+  const [editData, setEditData] = useState(null);
   const handleEditInputChange = (e) => {
     setEditData({ ...editData, [e.target.name]: e.target.value });
   };
@@ -53,14 +59,30 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
 
   return (
     <div className="p-4">
-      {/* Search Input */}
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="border p-2 w-full mb-4 rounded"
-      />
+      {/* Search & Date Filters */}
+      <div className="flex items-center space-x-4 mb-2">
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border p-2 w-1/3 rounded"
+        />
+        <label className="flex items-center">Start Date:</label>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="border p-2 rounded"
+        />
+        <label className="flex items-center">End Date:</label>
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="border p-2 rounded"
+        />
+      </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
@@ -93,13 +115,13 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
             {filteredData.length > 0 ? (
               filteredData.map((row, index) => (
                 <tr key={index} className="border border-gray-300">
-                  <td className="px-4 py-2 text-wrap">{row.name}</td>
-                  <td className="px-4 py-2 text-wrap">{row.description}</td>
-                  <td className="px-4 py-2 text-wrap">{row.createdAt}</td>
-                  <td className="px-4 py-2 text-wrap">{row.createdBy}</td>
-                  <td className="px-4 py-2 text-wrap">{row.updatedAt}</td>
-                  <td className="px-4 py-2 text-wrap">{row.updatedBy}</td>
-                  <td className="px-4 py-2">
+                  <td className=" text-wrap">{row.name}</td>
+                  <td className=" text-wrap">{row.description}</td>
+                  <td className=" text-wrap">{row.createdAt}</td>
+                  <td className=" text-wrap">{row.createdBy}</td>
+                  <td className=" text-wrap">{row.updatedAt}</td>
+                  <td className=" text-wrap">{row.updatedBy}</td>
+                  <td className="">
                     <span
                       className={`px-2 py-1 rounded text-white ${
                         row.status === "Active" ? "bg-green-500" : "bg-red-500"
@@ -111,9 +133,18 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
                   <td className="px-4 py-2">
                     <button
                       className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-                      onClick={() => onView(row.id)}
+                      onClick={() => {
+                        // Convert Blob to a downloadable URL
+                        const blobUrl = URL.createObjectURL(row.file.data);
+
+                        // Open the Excel Viewer page with the file URL as a query parameter
+                        window.open(
+                          `/view-excel?file=${encodeURIComponent(blobUrl)}`,
+                          "_blank"
+                        );
+                      }}
                     >
-                      View
+                      View File
                     </button>
                   </td>
                   <td className="px-4 py-2">

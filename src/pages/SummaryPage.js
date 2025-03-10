@@ -1,7 +1,31 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ReusableTable from "../components/ReusableTable/ReusableTable";
-import * as XLSX from "xlsx";
 import ExcelFileUploader from "./ExcelFileUploader";
+import * as XLSX from "xlsx";
+
+// Function to create an Excel Blob from JSON data
+const createExcelBlob = (data) => {
+  // Convert JSON data into an Excel sheet
+  const worksheet = XLSX.utils.json_to_sheet(data);
+
+  // Create a new Excel workbook
+  const workbook = XLSX.utils.book_new();
+
+  // Append the worksheet to the workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+  // Convert workbook to a binary array buffer
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx", // File format
+    type: "array", // Output as an array buffer
+  });
+
+  // Create a Blob from the array buffer and set the correct MIME type for Excel files
+  return new Blob([excelBuffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+};
 
 const SummaryPage = () => {
   // State to manage table data
@@ -16,10 +40,11 @@ const SummaryPage = () => {
       updatedBy: "Admin",
       status: "Active",
       file: {
-        name: "Project-Management-Sample-Data.xlsx",
-        data: new Blob(["Sample Data"], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        }),
+        name: "Sample-Data-1.xlsx",
+        data: createExcelBlob([
+          { Column1: "Value1", Column2: "Value2" },
+          { Column1: "Value3", Column2: "Value4" },
+        ]), // Create an actual Excel file inside Blob
       },
     },
     {
@@ -32,13 +57,28 @@ const SummaryPage = () => {
       updatedBy: "User",
       status: "Inactive",
       file: {
-        name: "shipment_data.xlsx",
-        data: new Blob(["Sample shipment data"], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        }),
+        name: "sample-data-1.xlsx",
+        data: createExcelBlob([
+          { Item: "Product A", Quantity: 10 },
+          { Item: "Product B", Quantity: 5 },
+        ]), // Create another Excel Blob
       },
     },
   ]);
+
+  const navigate = useNavigate();
+  // function to view excel
+  const onView = (file) => {
+    if (!file) return;
+
+    // Convert base64 or URL to a Blob before navigation
+    fetch(file)
+      .then((res) => res.blob())
+      .then((blob) => {
+        navigate("/view-excel", { state: { file: blob } });
+      })
+      .catch((err) => console.error("Error loading file:", err));
+  };
 
   // State for modal visibility and form inputs
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,9 +150,6 @@ const SummaryPage = () => {
     setTableData((prevData) => prevData.filter((item) => item.id !== id));
   };
 
-  // Handlers
-  const handleView = (id) => console.log(`Viewing item with ID: ${id}`);
-
   //function to downlaod excel of the row
   const handleDownload = (file) => {
     if (!file) {
@@ -144,7 +181,7 @@ const SummaryPage = () => {
 
       <ReusableTable
         data={tableData}
-        onView={handleView}
+        onView={onView}
         handleDownload={handleDownload}
         onEdit={handleEdit}
         onDelete={handleDelete}

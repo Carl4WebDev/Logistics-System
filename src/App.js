@@ -10,6 +10,7 @@ import ReportPage from "./pages/ReportPage";
 import DocumentPage from "./pages/DocumentPage";
 import ShipmentsPage from "./pages/ShipmentsPage";
 import SummaryPage from "./pages/SummaryPage";
+import ExcelViewer from "./pages/ExcelViewer";
 
 const Layout = ({ children }) => (
   <div className="flex min-h-screen justify-center align-middle">
@@ -39,6 +40,7 @@ function App() {
         <Route path="/documentuploader" element={<DocumentPage />} />
         <Route path="/shipment" element={<ShipmentsPage />} />
         <Route path="/summary" element={<SummaryPage />} />
+        <Route path="/view-excel" element={<ExcelViewer />} />
       </Routes>
     </Layout>
   );
