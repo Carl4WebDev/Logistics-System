@@ -185,6 +185,7 @@ const SummaryPage = () => {
         handleDownload={handleDownload}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        setTableData={setTableData}
       />
 
       {/* Modal for Adding New Summary */}

@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 
-const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
+const ReusableTable = ({
+  data,
+  onView,
+  handleDownload,
+  onEdit,
+  onDelete,
+  setTableData,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -26,7 +32,17 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
     return matchesSearch && matchesDateRange;
   });
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+
+  const handleSaveEdit = (updatedItem) => {
+    setTableData((prevData) =>
+      prevData.map((item) =>
+        item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+      )
+    );
+  };
+
   const handleEditInputChange = (e) => {
     setEditData({ ...editData, [e.target.name]: e.target.value });
   };
@@ -115,7 +131,7 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
             {filteredData.length > 0 ? (
               filteredData.map((row, index) => (
                 <tr key={index} className="border border-gray-300">
-                  <td className=" text-wrap">{row.name}</td>
+                  <td className="p-2 text-wrap">{row.name}</td>
                   <td className=" text-wrap">{row.description}</td>
                   <td className=" text-wrap">{row.createdAt}</td>
                   <td className=" text-wrap">{row.createdBy}</td>
@@ -201,7 +217,9 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
               type="text"
               name="name"
               value={editData?.name || ""}
-              onChange={handleEditInputChange}
+              onChange={(e) =>
+                setEditData({ ...editData, name: e.target.value })
+              }
               className="border p-2 w-full rounded mb-2"
               placeholder="Name"
             />
@@ -211,29 +229,22 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
               type="text"
               name="description"
               value={editData?.description || ""}
-              onChange={handleEditInputChange}
+              onChange={(e) =>
+                setEditData({ ...editData, description: e.target.value })
+              }
               className="border p-2 w-full rounded mb-2"
               placeholder="Description"
             />
 
-            {/* Updated By */}
-            <input
-              type="text"
-              name="updatedBy"
-              value={editData?.updatedBy || ""}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full rounded mb-2"
-              placeholder="Updated By"
-            />
-
-            {/* Status Dropdown */}
+            {/* Status */}
             <select
               name="status"
               value={editData?.status || ""}
-              onChange={handleEditInputChange}
+              onChange={(e) =>
+                setEditData({ ...editData, status: e.target.value })
+              }
               className="border p-2 w-full rounded mb-2"
             >
-              <option value="">Select Status</option>
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
@@ -242,7 +253,22 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
             <input
               type="file"
               name="file"
-              onChange={handleFileUpload}
+              onChange={(e) => {
+                const uploadedFile = e.target.files[0];
+                if (uploadedFile) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    const newFileBlob = new Blob([event.target.result], {
+                      type: uploadedFile.type,
+                    });
+                    setEditData({
+                      ...editData,
+                      file: { name: uploadedFile.name, data: newFileBlob },
+                    });
+                  };
+                  reader.readAsArrayBuffer(uploadedFile);
+                }
+              }}
               className="border p-2 w-full rounded mb-2"
             />
             {editData?.file && (
@@ -254,7 +280,7 @@ const ReusableTable = ({ data, onView, handleDownload, onEdit, onDelete }) => {
               <button
                 className="bg-blue-500 text-white px-4 py-2 rounded"
                 onClick={() => {
-                  onEdit(editData); // editData already includes file
+                  handleSaveEdit(editData);
                   setIsEditModalOpen(false);
                 }}
               >
