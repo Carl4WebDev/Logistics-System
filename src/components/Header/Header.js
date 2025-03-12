@@ -1,15 +1,32 @@
 import { useState, useEffect } from "react";
 
-
 import NavItem from "../Sidebar/NavItem";
 
-import { Menu, X, Home, Truck, BarChart2, ChevronDown, ChevronRight, User2 } from "lucide-react";
+import {
+  Menu,
+  X,
+  Home,
+  Truck,
+  BarChart2,
+  TruckIcon,
+  Package,
+  ClipboardList,
+  ChevronDown,
+  ChevronRight,
+  User2Icon,
+  Warehouse,
+  Users2Icon,
+  Folder,
+  IdCard,
+} from "lucide-react";
 
 export default function Navbar() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [logisticsOpen, setLogisticsOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+
+  const [isOpen, setIsOpen] = useState(true);
+  const [logisticsOpen, setLogisticsOpen] = useState(false);
 
   // Detect screen size change
   useEffect(() => {
@@ -25,7 +42,10 @@ export default function Navbar() {
 
       {/* Mobile Menu Button */}
       {isMobile && (
-        <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 focus:outline-none">
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="p-2 focus:outline-none"
+        >
           {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       )}
@@ -40,20 +60,49 @@ export default function Navbar() {
               {/* Logistic Management Dropdown */}
               <li>
                 <div
-                  className="flex items-center justify-between hover:bg-gray-800 cursor-pointer p-2 rounded-md"
+                  className={`flex items-center justify-between hover:bg-gray-800 p-2 rounded-md`}
                   onClick={() => setLogisticsOpen(!logisticsOpen)}
                 >
                   <div className="flex items-center">
-                    <Truck className="w-5 h-5 ml-3" />
-                    <span className="ml-2">Logistic Management</span>
+                    <Warehouse className="w-5 h-5 ml-3" />
+                    {isOpen && (
+                      <span className="ml-2">Logistic Management</span>
+                    )}
                   </div>
-                  {logisticsOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  {isOpen &&
+                    (logisticsOpen ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    ))}
                 </div>
 
                 {logisticsOpen && (
-                  <ul className="ml-8 space-y-1">
-                    <li><NavItem to="/fleetlist" text="Fleet Management" isOpen={true} /></li>
-                    <li><NavItem to="/shipments" text="Shipments" isOpen={true}/></li>
+                  <ul className="ml-2 space-y-1">
+                    <NavItem
+                      to="/summary"
+                      icon={<Folder className="w-4 h-4" />}
+                      text="Summary"
+                      isOpen={isOpen}
+                    />
+                    <NavItem
+                      to="/shipment"
+                      icon={<Package className="w-4 h-4" />}
+                      text="Shipments"
+                      isOpen={isOpen}
+                    />
+                    <NavItem
+                      to="/Vehicle"
+                      icon={<TruckIcon className="w-4 h-4" />}
+                      text="Vehicle"
+                      isOpen={isOpen}
+                    />
+                    <NavItem
+                      to="/Report"
+                      icon={<ClipboardList className="w-4 h-4" />}
+                      text="Report"
+                      isOpen={isOpen}
+                    />
                   </ul>
                 )}
               </li>
@@ -61,25 +110,38 @@ export default function Navbar() {
               {/* User Management Dropdown */}
               <li>
                 <div
-                  className="flex items-center justify-between hover:bg-gray-800 cursor-pointer p-2 rounded-md"
+                  className={`flex items-center justify-between hover:bg-gray-800 p-2 rounded-md`}
                   onClick={() => setUserOpen(!userOpen)}
                 >
                   <div className="flex items-center">
-                    <User2 className="w-5 h-5 ml-3" />
-                    <span className="ml-2">User Management</span>
+                    <User2Icon className="w-5 h-5 ml-3" />
+                    {isOpen && <span className="ml-2">User Management</span>}
                   </div>
-                  {userOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  {isOpen &&
+                    (userOpen ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    ))}
                 </div>
 
                 {userOpen && (
-                  <ul className="ml-8 space-y-1">
-                    <li><NavItem to="/employee" text="Employee"isOpen={true} /></li>
-                    <li><NavItem to="/driver" text="Driver" isOpen={true} /></li>
+                  <ul className="space-y-1 ml-2">
+                    <NavItem
+                      to="/fleetlist"
+                      icon={<Users2Icon className="w-4 h-4" />}
+                      text="Employee"
+                      isOpen={isOpen}
+                    />
+                    <NavItem
+                      to="/shipment"
+                      icon={<IdCard className="w-4 h-4" />}
+                      text="Driver"
+                      isOpen={isOpen}
+                    />
                   </ul>
                 )}
               </li>
-
-              <NavItem to="/reportchart" icon={<BarChart2 />} text="Reports & Analytics" isOpen={true} />
             </ul>
           </nav>
         </div>

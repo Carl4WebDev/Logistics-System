@@ -110,7 +110,7 @@ const SummaryPage = () => {
     <div className="p-5">
       {/* Title and Create Button */}
       <div className="flex justify-around items-center mb-4">
-        <h2 className="text-xl font-bold">Summary</h2>
+        <h2 className="text-3xl text-white font-bold">Summary</h2>
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
           onClick={() => setIsModalOpen(true)}

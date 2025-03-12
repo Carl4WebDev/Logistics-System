@@ -76,34 +76,41 @@ const ReusableTable = ({
   return (
     <div className="p-4">
       {/* Search & Date Filters */}
-      <div className="flex items-center space-x-4 mb-2">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2 w-1/3 rounded"
-        />
-        <label className="flex items-center">Start Date:</label>
+      <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-4 mb-2">
+        <label className="flex items-center justify-center text-white w-full md:w-auto">
+          Start Date:
+        </label>
         <input
           type="date"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-2 rounded w-full md:w-auto"
         />
-        <label className="flex items-center">End Date:</label>
+
+        <label className="flex items-center justify-center text-white w-full md:w-auto">
+          End Date:
+        </label>
         <input
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-2 rounded w-full md:w-auto"
         />
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-96 border-collapse border border-gray-300">
-          <thead className="bg-gray-100">
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="border p-2 w-1/3 rounded min-w-full mb-2"
+      />
+
+      {/* Table for Larger Screens */}
+      <div className="overflow-x-auto hidden md:block">
+        <table className="table-auto w-full border-collapse border border-gray-300 text-white">
+          {/* Table Head */}
+          <thead>
             <tr>
               {[
                 "Name",
@@ -127,6 +134,8 @@ const ReusableTable = ({
               ))}
             </tr>
           </thead>
+
+          {/* Table Body */}
           <tbody>
             {filteredData.length > 0 ? (
               filteredData.map((row, index) => (
@@ -150,13 +159,9 @@ const ReusableTable = ({
                     <button
                       className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
                       onClick={() => {
-                        // Convert Blob to a downloadable URL
                         const blobUrl = URL.createObjectURL(row.file.data);
-
-                        // Include the file name in the URL parameters
                         const fileName = encodeURIComponent(row.file.name);
 
-                        // Open the Excel Viewer page with both file URL and file name
                         window.open(
                           `/view-excel?file=${encodeURIComponent(
                             blobUrl
@@ -170,7 +175,7 @@ const ReusableTable = ({
                   <td className="">
                     <button
                       className="bg-gray-500 text-white px-3 py-1 rounded text-sm"
-                      onClick={() => handleDownload(row.file)} // Calls handleDownload from parent
+                      onClick={() => handleDownload(row.file)}
                     >
                       {row.file.name}
                     </button>
@@ -179,8 +184,8 @@ const ReusableTable = ({
                     <button
                       className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
                       onClick={() => {
-                        setEditData(row); // Store selected row's data in state
-                        setIsEditModalOpen(true); // Open the modal
+                        setEditData(row);
+                        setIsEditModalOpen(true);
                       }}
                     >
                       Edit
@@ -208,6 +213,87 @@ const ReusableTable = ({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Column Layout for Mobile Screens */}
+      <div className="block md:hidden space-y-4">
+        {filteredData.length > 0 ? (
+          filteredData.map((row, index) => (
+            <div
+              key={index}
+              className="border p-4 rounded-lg shadow-md bg-gray-800 text-white"
+            >
+              <p>
+                <strong>Name:</strong> {row.name}
+              </p>
+              <p>
+                <strong>Description:</strong> {row.description}
+              </p>
+              <p>
+                <strong>Created At:</strong> {row.createdAt}
+              </p>
+              <p>
+                <strong>Created By:</strong> {row.createdBy}
+              </p>
+              <p>
+                <strong>Updated At:</strong> {row.updatedAt}
+              </p>
+              <p>
+                <strong>Updated By:</strong> {row.updatedBy}
+              </p>
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  className={`px-2 py-1 rounded text-white ${
+                    row.status === "Active" ? "bg-green-500" : "bg-red-500"
+                  }`}
+                >
+                  {row.status}
+                </span>
+              </p>
+              <div className="flex flex-col md:flex-row gap-2 mt-2">
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                  onClick={() => {
+                    const blobUrl = URL.createObjectURL(row.file.data);
+                    const fileName = encodeURIComponent(row.file.name);
+
+                    window.open(
+                      `/view-excel?file=${encodeURIComponent(
+                        blobUrl
+                      )}&fileName=${fileName}`
+                    );
+                  }}
+                >
+                  View File
+                </button>
+                <button
+                  className="bg-gray-500 text-white px-3 py-1 rounded text-sm"
+                  onClick={() => handleDownload(row.file)}
+                >
+                  {row.file.name}
+                </button>
+                <button
+                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                  onClick={() => {
+                    setEditData(row);
+                    setIsEditModalOpen(true);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                  onClick={() => onDelete(row.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500">No matching data found</p>
+        )}
       </div>
 
       {/* Edit Modal */}

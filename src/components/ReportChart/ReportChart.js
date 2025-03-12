@@ -1,5 +1,13 @@
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const data = [
   { name: "January", orders: 400, deliveries: 240 },
@@ -10,7 +18,7 @@ const data = [
 
 const ReportChart = () => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
+    <div className=" p-4 rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Orders & Deliveries Overview</h2>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>

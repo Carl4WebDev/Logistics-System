@@ -21,8 +21,8 @@ import NavItem from "./NavItem";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [logisticsOpen, setLogisticsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [userOpen, setUserOpen] = useState(false);
 
   // Detect screen size change
@@ -36,14 +36,14 @@ export default function Sidebar() {
   if (isMobile) return null;
 
   return (
-    <div className="flex mt-16">
+    <div className="flex mt-16  ">
       {/* Sidebar */}
       <div
         className={`${
           isOpen ? "w-64" : "w-16"
         } bg-gray-900 h-auto text-white transition-all duration-300 ease-in-out fixed p-2`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-gray-700 ">
           <h1 className={`text-2xl font-bold ${!isOpen && "hidden"}`}>
             Logistics
           </h1>

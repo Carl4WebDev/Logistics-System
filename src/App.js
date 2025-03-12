@@ -11,14 +11,14 @@ import ExcelViewer from "./pages/ExcelViewer";
 import { SummaryProvider } from "./contexts/SummaryProvider"; // Correct import
 
 const Layout = ({ children }) => (
-  <div className="flex min-h-screen justify-center align-middle">
-    <Sidebar />
-    <div className="row flex-1">
-      <div className="row">
-        <Header />
+  <div className="w-full h-screen">
+    <Header />
+    <div className="grid grid-cols-12">
+      <div className="hidden md:block md:col-span-2">
+        <Sidebar />
       </div>
-      <div className="row">
-        <main className="h-auto mt-20 flex justify-center">{children}</main>
+      <div className="col-span-12 md:col-span-10">
+        <main className="h-full mt-20 flex justify-start m-2">{children}</main>
       </div>
     </div>
   </div>

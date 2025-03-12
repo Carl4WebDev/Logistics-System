@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 // Navigation Item Component
-export default function NavItem ({ to, icon, text, isOpen }) {
+export default function NavItem({ to, icon, text, isOpen }) {
   return (
     <li>
       <NavLink
@@ -12,5 +12,5 @@ export default function NavItem ({ to, icon, text, isOpen }) {
         {isOpen && <span className="ml-5">{text}</span>}
       </NavLink>
     </li>
-  )
-};
+  );
+}
