@@ -1,70 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useSummaryContext } from "../contexts/SummaryProvider";
 import { useNavigate } from "react-router-dom";
 import ReusableTable from "../components/ReusableTable/ReusableTable";
-import ExcelFileUploader from "./ExcelFileUploader";
-import * as XLSX from "xlsx";
-
-// Function to create an Excel Blob from JSON data
-const createExcelBlob = (data) => {
-  // Convert JSON data into an Excel sheet
-  const worksheet = XLSX.utils.json_to_sheet(data);
-
-  // Create a new Excel workbook
-  const workbook = XLSX.utils.book_new();
-
-  // Append the worksheet to the workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-  // Convert workbook to a binary array buffer
-  const excelBuffer = XLSX.write(workbook, {
-    bookType: "xlsx", // File format
-    type: "array", // Output as an array buffer
-  });
-
-  // Create a Blob from the array buffer and set the correct MIME type for Excel files
-  return new Blob([excelBuffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
-};
 
 const SummaryPage = () => {
-  // State to manage table data
-  const [tableData, setTableData] = useState([
-    {
-      id: 1,
-      name: "Summary Item 1",
-      description: "Description of item 1",
-      createdAt: "2025-03-07",
-      createdBy: "Carl",
-      updatedAt: "2025-03-07",
-      updatedBy: "Admin",
-      status: "Active",
-      file: {
-        name: "Sample-Data-1.xlsx",
-        data: createExcelBlob([
-          { Column1: "Value1", Column2: "Value2" },
-          { Column1: "Value3", Column2: "Value4" },
-        ]), // Create an actual Excel file inside Blob
-      },
-    },
-    {
-      id: 2,
-      name: "Summary Item 2",
-      description: "Description of item 2",
-      createdAt: "2025-03-06",
-      createdBy: "Ivan",
-      updatedAt: "2025-03-07",
-      updatedBy: "User",
-      status: "Inactive",
-      file: {
-        name: "sample-data-1.xlsx",
-        data: createExcelBlob([
-          { Item: "Product A", Quantity: 10 },
-          { Item: "Product B", Quantity: 5 },
-        ]), // Create another Excel Blob
-      },
-    },
-  ]);
+  const { tableData, setTableData } = useSummaryContext();
 
   const navigate = useNavigate();
   // function to view excel
@@ -293,7 +233,6 @@ const SummaryPage = () => {
           </div>
         </div>
       )}
-      <ExcelFileUploader />
     </div>
   );
 };

@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useNavigate } from "react-router-dom";
+import { useSummaryContext } from "../contexts/SummaryProvider"; // Import context
 
 const ExcelViewer = () => {
   const [tableData, setTableData] = useState([]);
+  const [fileName, setFileName] = useState(""); // Initialize empty to retrieve from URL
+  const { tableData: summaryData, setTableData: setSummaryData } =
+    useSummaryContext(); // Access context
   const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const fileUrl = params.get("file");
+    const fileNameFromParams = params.get("fileName"); // Retrieve the file name
+
+    if (fileNameFromParams) {
+      setFileName(fileNameFromParams); // Set file name from URL
+    } else {
+      // If fileName is not in URL, fetch from SummaryContext
+      const foundFile = summaryData.find((item) => item.id === 1)?.file;
+      setFileName(foundFile ? foundFile.name : "Updated_Excel_File.xlsx");
+    }
 
     if (fileUrl) {
       fetch(fileUrl)
@@ -40,8 +53,8 @@ const ExcelViewer = () => {
     setTableData(updatedData);
   };
 
-  // Download edited Excel file
-  const handleDownload = () => {
+  // Function to create updated Excel blob
+  const createUpdatedExcelBlob = () => {
     const worksheet = XLSX.utils.json_to_sheet(tableData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -51,24 +64,53 @@ const ExcelViewer = () => {
       type: "array",
     });
 
-    const blob = new Blob([excelBuffer], {
+    return new Blob([excelBuffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
+  };
 
-    const blobUrl = URL.createObjectURL(blob);
+  // Save updated data in SummaryPage and redirect
+  const handleSave = () => {
+    const updatedFile = { name: fileName, data: createUpdatedExcelBlob() };
 
-    // Trigger download
+    const updatedSummaryData = summaryData.map((item) =>
+      item.id === 1 ? { ...item, file: updatedFile } : item
+    );
+
+    setSummaryData(updatedSummaryData); // Update context
+    navigate("/summary");
+  };
+
+  // Function to download updated Excel data
+  const handleDownload = () => {
+    const blob = createUpdatedExcelBlob();
+    const url = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
-    link.href = blobUrl;
-    link.download = "Updated_Excel_File.xlsx";
+    link.href = url;
+    link.download = fileName || "Updated_Excel_File.xlsx"; // Use provided file name or default
     document.body.appendChild(link);
+
     link.click();
     document.body.removeChild(link);
+
+    URL.revokeObjectURL(url); // Clean up
   };
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Excel File Content</h2>
+
+      {/* Editable File Name */}
+      <div className="mb-4">
+        <label className="block text-gray-600 mb-2">File Name:</label>
+        <input
+          type="text"
+          value={fileName}
+          onChange={(e) => setFileName(e.target.value)}
+          className="border px-2 py-1 rounded w-full"
+        />
+      </div>
 
       {tableData.length > 0 ? (
         <table className="border-collapse border border-gray-300 w-full">
@@ -107,10 +149,17 @@ const ExcelViewer = () => {
       {/* Buttons */}
       <div className="flex space-x-4 mt-4">
         <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleSave}
+        >
+          Save & Return
+        </button>
+
+        <button
           className="bg-green-500 text-white px-4 py-2 rounded"
           onClick={handleDownload}
         >
-          Download Updated File
+          Download File
         </button>
       </div>
     </div>

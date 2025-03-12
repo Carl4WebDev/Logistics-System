@@ -146,29 +146,33 @@ const ReusableTable = ({
                       {row.status}
                     </span>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="">
                     <button
                       className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
                       onClick={() => {
                         // Convert Blob to a downloadable URL
                         const blobUrl = URL.createObjectURL(row.file.data);
 
-                        // Open the Excel Viewer page with the file URL as a query parameter
+                        // Include the file name in the URL parameters
+                        const fileName = encodeURIComponent(row.file.name);
+
+                        // Open the Excel Viewer page with both file URL and file name
                         window.open(
-                          `/view-excel?file=${encodeURIComponent(blobUrl)}`,
-                          "_blank"
+                          `/view-excel?file=${encodeURIComponent(
+                            blobUrl
+                          )}&fileName=${fileName}`
                         );
                       }}
                     >
                       View File
                     </button>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="">
                     <button
                       className="bg-gray-500 text-white px-3 py-1 rounded text-sm"
                       onClick={() => handleDownload(row.file)} // Calls handleDownload from parent
                     >
-                      Download {row.file.name}
+                      {row.file.name}
                     </button>
                   </td>
                   <td className="px-4 py-2">
