@@ -7,8 +7,8 @@ import DashboardPage from "./pages/DashboardPage";
 import ReportPage from "./pages/ReportPage";
 import ShipmentsPage from "./pages/ShipmentsPage";
 import SummaryPage from "./pages/SummaryPage";
-import ExcelViewer from "./pages/ExcelViewer";
 import { SummaryProvider } from "./contexts/SummaryProvider"; // Correct import
+import { ShipmentsProvider } from "./contexts/ShipmentsProvider"; // Correct import
 
 const Layout = ({ children }) => (
   <div className="w-full h-screen">
@@ -30,9 +30,8 @@ function App() {
       <Routes>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/report" element={<ReportPage />} />
-        <Route path="/shipment" element={<ShipmentsPage />} />
+        <Route path="/shipments" element={<ShipmentsPage />} />
         <Route path="/summary" element={<SummaryPage />} />
-        <Route path="/view-excel" element={<ExcelViewer />} />
       </Routes>
     </Layout>
   );
@@ -41,9 +40,11 @@ function App() {
 export default function AppWrapper() {
   return (
     <Router>
-      <SummaryProvider>
-        <App />
-      </SummaryProvider>
+      <ShipmentsProvider>
+        <SummaryProvider>
+          <App />
+        </SummaryProvider>
+      </ShipmentsProvider>
     </Router>
   );
 }

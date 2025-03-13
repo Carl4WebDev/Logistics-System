@@ -3,6 +3,8 @@ import { useSummaryContext } from "../contexts/SummaryProvider";
 import { useNavigate } from "react-router-dom";
 import ReusableTable from "../components/ReusableTable/ReusableTable";
 
+import * as XLSX from "xlsx";
+
 const SummaryPage = () => {
   const { tableData, setTableData } = useSummaryContext();
 
@@ -92,24 +94,23 @@ const SummaryPage = () => {
 
   //function to downlaod excel of the row
   const handleDownload = (file) => {
-    if (!file) {
-      alert("No file available.");
-      return;
-    }
-
     const url = URL.createObjectURL(file.data);
+
     const link = document.createElement("a");
     link.href = url;
-    link.download = file.name;
+    link.download = file.name || "Updated_Excel_File.xlsx";
     document.body.appendChild(link);
+
     link.click();
     document.body.removeChild(link);
+
+    URL.revokeObjectURL(url); // Clean up the blob URL
   };
 
   return (
     <div className="p-5">
       {/* Title and Create Button */}
-      <div className="flex justify-around items-center mb-4">
+      <div className="flex justify-between items-center mb-4 ">
         <h2 className="text-3xl text-white font-bold">Summary</h2>
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"

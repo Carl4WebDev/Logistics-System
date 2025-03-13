@@ -87,7 +87,7 @@ export default function Sidebar() {
                     isOpen={isOpen}
                   />
                   <NavItem
-                    to="/shipment"
+                    to="/shipments"
                     icon={<Package className="w-4 h-4" />}
                     text="Shipments"
                     isOpen={isOpen}

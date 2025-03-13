@@ -10,9 +10,70 @@ const ReusableTable = ({
   setTableData,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [modalSearchTerm, setModalSearchTerm] = useState(""); // For the modal
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // ExcelViewer
+  const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
+  const [excelTableData, setExcelTableData] = useState([]);
+  const [excelFileName, setExcelFileName] = useState("");
+  const [selectedExcelId, setSelectedExcelId] = useState(null);
+
+  const handleViewFile = (file) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+        setExcelTableData(jsonData);
+        setExcelFileName(file.name || "Updated_Excel_File.xlsx");
+        setIsExcelModalOpen(true);
+      } catch (error) {
+        console.error("Error parsing Excel file:", error);
+      }
+    };
+    reader.readAsArrayBuffer(file.data);
+  };
+  const handleSaveExcelData = () => {
+    const worksheet = XLSX.utils.json_to_sheet(excelTableData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const updatedFile = {
+      name: excelFileName || "Updated_Excel_File.xlsx", // Updated name
+      data: new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }),
+    };
+
+    setTableData((prevData) =>
+      prevData.map((item) =>
+        item.id === selectedExcelId ? { ...item, file: updatedFile } : item
+      )
+    );
+
+    setIsExcelModalOpen(false); // Close modal after saving
+    setSelectedExcelId(null); // Reset selected ID
+  };
+
+  const handleExcelCellChange = (rowIndex, key, value) => {
+    const updatedData = [...excelTableData];
+    updatedData[rowIndex][key] = value;
+    setExcelTableData(updatedData);
+  };
 
   // Filter data based on search term and date range
   const filteredData = data.filter((row) => {
@@ -77,6 +138,13 @@ const ReusableTable = ({
     <div className="p-4">
       {/* Search & Date Filters */}
       <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-4 mb-2">
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border p-2 rounded w-full"
+        />
         <label className="flex items-center justify-center text-white w-full md:w-auto">
           Start Date:
         </label>
@@ -97,14 +165,6 @@ const ReusableTable = ({
           className="border p-2 rounded w-full md:w-auto"
         />
       </div>
-
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="border p-2 w-1/3 rounded min-w-full mb-2"
-      />
 
       {/* Table for Larger Screens */}
       <div className="overflow-x-auto hidden md:block">
@@ -156,21 +216,36 @@ const ReusableTable = ({
                     </span>
                   </td>
                   <td className="">
-                    <button
-                      className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-                      onClick={() => {
-                        const blobUrl = URL.createObjectURL(row.file.data);
-                        const fileName = encodeURIComponent(row.file.name);
+                    <td className="">
+                      <button
+                        className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                        onClick={() => {
+                          const reader = new FileReader();
 
-                        window.open(
-                          `/view-excel?file=${encodeURIComponent(
-                            blobUrl
-                          )}&fileName=${fileName}`
-                        );
-                      }}
-                    >
-                      View File
-                    </button>
+                          reader.onload = (event) => {
+                            try {
+                              const workbook = XLSX.read(event.target.result, {
+                                type: "array",
+                              });
+                              const sheetName = workbook.SheetNames[0];
+                              const sheet = workbook.Sheets[sheetName];
+                              const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+                              setSelectedExcelId(row.id); // Track selected file's ID
+                              setExcelTableData(jsonData); // Set data for editing
+                              setExcelFileName(row.file.name); // Set file name for editing
+                              setIsExcelModalOpen(true);
+                            } catch (error) {
+                              console.error("Error parsing Excel file:", error);
+                            }
+                          };
+
+                          reader.readAsArrayBuffer(row.file.data); // Properly read the data as an ArrayBuffer
+                        }}
+                      >
+                        View File
+                      </button>
+                    </td>
                   </td>
                   <td className="">
                     <button
@@ -215,6 +290,107 @@ const ReusableTable = ({
         </table>
       </div>
 
+      {/* Excel Viewer Modal */}
+      {isExcelModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg w-[90%] h-[90%] max-w-screen-lg max-h-[90vh] overflow-y-auto">
+            {/* Editable File Name */}
+            <div className="mb-4">
+              <label className="block mb-2 font-bold text-lg">File Name:</label>
+              <input
+                type="text"
+                value={excelFileName}
+                onChange={(e) => setExcelFileName(e.target.value)}
+                className="border px-2 py-1 rounded w-full"
+              />
+            </div>
+
+            {/* Search Bar for Excel Data */}
+            {excelTableData.length > 0 && (
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={modalSearchTerm}
+                  onChange={(e) => setModalSearchTerm(e.target.value)}
+                  className="border px-2 py-1 rounded w-full"
+                />
+              </div>
+            )}
+
+            {/* Editable Excel Data Table */}
+            {excelTableData.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="table-auto w-full border-collapse border border-gray-300 text-black">
+                  <thead>
+                    <tr>
+                      {Object.keys(excelTableData[0]).map((header, index) => (
+                        <th
+                          key={index}
+                          className="border border-gray-300 px-4 py-2 text-left min-w-[200px] whitespace-nowrap"
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {excelTableData
+                      .filter((row) =>
+                        Object.values(row)
+                          .join(" ")
+                          .toLowerCase()
+                          .includes(modalSearchTerm.toLowerCase())
+                      )
+                      .map((row, rowIndex) => (
+                        <tr key={rowIndex} className="border border-gray-300">
+                          {Object.entries(row).map(([key, cell], cellIndex) => (
+                            <td
+                              key={cellIndex}
+                              className="px-4 py-2 min-w-[200px] whitespace-nowrap"
+                            >
+                              <input
+                                type="text"
+                                value={cell}
+                                onChange={(e) =>
+                                  handleExcelCellChange(
+                                    rowIndex,
+                                    key,
+                                    e.target.value
+                                  )
+                                }
+                                className="border p-1 w-full"
+                              />
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p>No data available.</p>
+            )}
+
+            {/* Buttons */}
+            <div className="flex justify-end mt-4 gap-2">
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded"
+                onClick={handleSaveExcelData}
+              >
+                Save Changes
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsExcelModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Column Layout for Mobile Screens */}
       <div className="block md:hidden space-y-4">
         {filteredData.length > 0 ? (
@@ -255,14 +431,27 @@ const ReusableTable = ({
                 <button
                   className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
                   onClick={() => {
-                    const blobUrl = URL.createObjectURL(row.file.data);
-                    const fileName = encodeURIComponent(row.file.name);
+                    const reader = new FileReader();
 
-                    window.open(
-                      `/view-excel?file=${encodeURIComponent(
-                        blobUrl
-                      )}&fileName=${fileName}`
-                    );
+                    reader.onload = (event) => {
+                      try {
+                        const workbook = XLSX.read(event.target.result, {
+                          type: "array",
+                        });
+                        const sheetName = workbook.SheetNames[0];
+                        const sheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+                        setSelectedExcelId(row.id); // Track selected file's ID
+                        setExcelTableData(jsonData); // Set data for editing
+                        setExcelFileName(row.file.name); // Set file name for editing
+                        setIsExcelModalOpen(true);
+                      } catch (error) {
+                        console.error("Error parsing Excel file:", error);
+                      }
+                    };
+
+                    reader.readAsArrayBuffer(row.file.data); // Properly read the data as an ArrayBuffer
                   }}
                 >
                   View File

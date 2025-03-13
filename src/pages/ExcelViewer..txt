@@ -96,7 +96,7 @@ const ExcelViewer = () => {
   };
 
   return (
-    <div className="p-4 text-white">
+    <div className="ml-6 text-white">
       <h2 className="text-xl font-bold mb-4">Excel File Content</h2>
 
       {/* Editable File Name */}
