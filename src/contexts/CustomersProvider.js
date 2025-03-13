@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 import * as XLSX from "xlsx";
 
 // Create the context
-const ShipmentsContext = createContext();
+const CustomersContext = createContext();
 
 // Function to create an Excel Blob
 const createExcelBlob = (data) => {
@@ -18,20 +18,20 @@ const createExcelBlob = (data) => {
 };
 
 // Provider component
-export const ShipmentsProvider = ({ children, initialData = [] }) => {
+export const CustomersProvider = ({ children, initialData = [] }) => {
   // State to manage table data
-  const [shipmentsData, setShipmentsData] = useState([
+  const [customersData, setCustomersData] = useState([
     {
       id: 1,
-      name: "Shipments Item 1",
+      name: "customer Item 1",
       description: "Description of item 1",
       createdAt: "2025-03-07",
-      createdBy: "Jane",
+      createdBy: "John",
       updatedAt: "2025-03-07",
       updatedBy: "Admin",
       status: "Active",
       file: {
-        name: "shipments-sample-1.xlsx",
+        name: "customer-sample-1.xlsx",
         data: createExcelBlob([
           { Column1: "Value1", Column2: "Value2" },
           { Column1: "Value3", Column2: "Value4" },
@@ -40,7 +40,7 @@ export const ShipmentsProvider = ({ children, initialData = [] }) => {
     },
     {
       id: 2,
-      name: "Shipments Item 2",
+      name: "customer Item 2",
       description: "Description of item 2",
       createdAt: "2025-03-06",
       createdBy: "Doe",
@@ -48,7 +48,7 @@ export const ShipmentsProvider = ({ children, initialData = [] }) => {
       updatedBy: "User",
       status: "Inactive",
       file: {
-        name: "shipments-sample-2.xlsx",
+        name: "customer-sample-2.xlsx",
         data: createExcelBlob([
           { Item: "Product A", Quantity: 10 },
           { Item: "Product B", Quantity: 5 },
@@ -58,11 +58,11 @@ export const ShipmentsProvider = ({ children, initialData = [] }) => {
   ]);
 
   return (
-    <ShipmentsContext.Provider value={{ shipmentsData, setShipmentsData }}>
+    <CustomersContext.Provider value={{ customersData, setCustomersData }}>
       {children}
-    </ShipmentsContext.Provider>
+    </CustomersContext.Provider>
   );
 };
 
 // Custom hook for consuming context
-export const useShipmentsContext = () => useContext(ShipmentsContext);
+export const useCustomersContext = () => useContext(CustomersContext);

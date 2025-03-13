@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 import NavItem from "../Sidebar/NavItem";
 
+import logiTrack from "../../assets/images/logiTrack-bg.jpg";
+
 import {
   Menu,
   X,
@@ -18,6 +20,7 @@ import {
   Users2Icon,
   Folder,
   IdCard,
+  UserCheck,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -36,9 +39,17 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-gray-900 text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
+    <nav className="bg-gray-950  text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
       {/* Left Side: Logo */}
-      <div className="text-2xl font-bold">LogiTrack</div>
+      <div className="font-bold flex ml-2 items-center justify-center">
+        <img
+          src={logiTrack}
+          width={"50px"}
+          height={"50px"}
+          className="rounded-full"
+        />
+        <h1 className="ml-2 text-2xl">LogiTrack</h1>
+      </div>
 
       {/* Mobile Menu Button */}
       {isMobile && (
@@ -52,8 +63,10 @@ export default function Navbar() {
 
       {/* Sidebar (Only Visible in Mobile Mode) */}
       {isMobile && menuOpen && (
-        <div className="absolute top-16 left-0 w-64 bg-gray-900 h-screen p-4 text-white">
+        <div className="absolute top-24  left-0 w-64 bg-gray-900 h-screen p-4 text-white">
           <nav className="mt-4">
+            <h1 className="text-2xl">Categories</h1>
+            <hr></hr>
             <ul className="space-y-2">
               <NavItem to="/" icon={<Home />} text="Dashboard" isOpen={true} />
 
@@ -86,9 +99,15 @@ export default function Navbar() {
                       isOpen={isOpen}
                     />
                     <NavItem
-                      to="/shipment"
+                      to="/shipments"
                       icon={<Package className="w-4 h-4" />}
                       text="Shipments"
+                      isOpen={isOpen}
+                    />
+                    <NavItem
+                      to="/customers"
+                      icon={<UserCheck className="w-4 h-4" />}
+                      text="Customers"
                       isOpen={isOpen}
                     />
                     <NavItem

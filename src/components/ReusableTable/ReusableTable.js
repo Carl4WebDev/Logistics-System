@@ -9,6 +9,10 @@ const ReusableTable = ({
   onDelete,
   setTableData,
 }) => {
+  //pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Change this value if you want to modify items per page
+
   const [searchTerm, setSearchTerm] = useState("");
   const [modalSearchTerm, setModalSearchTerm] = useState(""); // For the modal
 
@@ -92,6 +96,13 @@ const ReusableTable = ({
 
     return matchesSearch && matchesDateRange;
   });
+
+  // Calculate start and end index for the current page's data
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  // Slice data to display only the current page's items
+  const currentData = filteredData.slice(startIndex, endIndex);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
@@ -187,7 +198,7 @@ const ReusableTable = ({
               ].map((header) => (
                 <th
                   key={header}
-                  className="border border-gray-300 px-4 py-2 text-left"
+                  className="border border-gray-300 bg-gray-800 px-4 py-2 text-left"
                 >
                   {header}
                 </th>
@@ -197,8 +208,8 @@ const ReusableTable = ({
 
           {/* Table Body */}
           <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((row, index) => (
+            {currentData.length > 0 ? (
+              currentData.map((row, index) => (
                 <tr key={index} className="border border-gray-300">
                   <td className="p-2 text-wrap">{row.name}</td>
                   <td className=" text-wrap">{row.description}</td>
@@ -393,8 +404,8 @@ const ReusableTable = ({
 
       {/* Column Layout for Mobile Screens */}
       <div className="block md:hidden space-y-4">
-        {filteredData.length > 0 ? (
-          filteredData.map((row, index) => (
+        {currentData.length > 0 ? (
+          currentData.map((row, index) => (
             <div
               key={index}
               className="border p-4 rounded-lg shadow-md bg-gray-800 text-white"
@@ -487,7 +498,7 @@ const ReusableTable = ({
 
       {/* Edit Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg w-3/5">
             <h2 className="text-xl font-bold mb-4">Edit Item</h2>
 
@@ -575,6 +586,40 @@ const ReusableTable = ({
           </div>
         </div>
       )}
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center gap-4 mt-4">
+        <button
+          className={`px-3 py-1 rounded bg-gray-500 text-white ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+
+        <span className="text-white">
+          Page {currentPage} of {Math.ceil(filteredData.length / itemsPerPage)}
+        </span>
+
+        <button
+          className={`px-3 py-1 rounded bg-blue-500 text-white ${
+            currentPage === Math.ceil(filteredData.length / itemsPerPage)
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
+          onClick={() =>
+            setCurrentPage((prev) =>
+              Math.min(prev + 1, Math.ceil(filteredData.length / itemsPerPage))
+            )
+          }
+          disabled={
+            currentPage === Math.ceil(filteredData.length / itemsPerPage)
+          }
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

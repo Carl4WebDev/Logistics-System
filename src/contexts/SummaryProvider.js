@@ -26,7 +26,7 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       name: "Summary Item 1",
       description: "Description of item 1",
       createdAt: "2025-03-07",
-      createdBy: "Carl",
+      createdBy: "Jone",
       updatedAt: "2025-03-07",
       updatedBy: "Admin",
       status: "Active",
@@ -43,7 +43,75 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       name: "Summary Item 2",
       description: "Description of item 2",
       createdAt: "2025-03-06",
+      createdBy: "Doe",
+      updatedAt: "2025-03-07",
+      updatedBy: "User",
+      status: "Inactive",
+      file: {
+        name: "sample-data-1.xlsx",
+        data: createExcelBlob([
+          { Item: "Product A", Quantity: 10 },
+          { Item: "Product B", Quantity: 5 },
+        ]), // Create another Excel Blob
+      },
+    },
+    {
+      id: 3,
+      name: "Summary Item 3",
+      description: "Description of item 2",
+      createdAt: "2025-03-06",
       createdBy: "Ivan",
+      updatedAt: "2025-03-07",
+      updatedBy: "User",
+      status: "Inactive",
+      file: {
+        name: "sample-data-1.xlsx",
+        data: createExcelBlob([
+          { Item: "Product A", Quantity: 10 },
+          { Item: "Product B", Quantity: 5 },
+        ]), // Create another Excel Blob
+      },
+    },
+    {
+      id: 4,
+      name: "Summary Item 4",
+      description: "Description of item 2",
+      createdAt: "2025-03-06",
+      createdBy: "Earl",
+      updatedAt: "2025-03-07",
+      updatedBy: "User",
+      status: "Inactive",
+      file: {
+        name: "sample-data-1.xlsx",
+        data: createExcelBlob([
+          { Item: "Product A", Quantity: 10 },
+          { Item: "Product B", Quantity: 5 },
+        ]), // Create another Excel Blob
+      },
+    },
+    {
+      id: 5,
+      name: "Summary Item 5",
+      description: "Description of item 2",
+      createdAt: "2025-03-06",
+      createdBy: "James",
+      updatedAt: "2025-03-07",
+      updatedBy: "User",
+      status: "Inactive",
+      file: {
+        name: "sample-data-1.xlsx",
+        data: createExcelBlob([
+          { Item: "Product A", Quantity: 10 },
+          { Item: "Product B", Quantity: 5 },
+        ]), // Create another Excel Blob
+      },
+    },
+    {
+      id: 6,
+      name: "Summary Item 6",
+      description: "Description of item 2",
+      createdAt: "2025-03-06",
+      createdBy: "George",
       updatedAt: "2025-03-07",
       updatedBy: "User",
       status: "Inactive",

@@ -9,6 +9,11 @@ import ShipmentsPage from "./pages/ShipmentsPage";
 import SummaryPage from "./pages/SummaryPage";
 import { SummaryProvider } from "./contexts/SummaryProvider"; // Correct import
 import { ShipmentsProvider } from "./contexts/ShipmentsProvider"; // Correct import
+import { CustomersProvider } from "./contexts/CustomersProvider"; // Correct import
+import CustomersPage from "./pages/CustomersPage";
+import VehiclePage from "./pages/VehiclePage";
+import EmployeePage from "./pages/EmployeePage";
+import DriverPage from "./pages/DriverPage";
 
 const Layout = ({ children }) => (
   <div className="w-full h-screen">
@@ -18,7 +23,7 @@ const Layout = ({ children }) => (
         <Sidebar />
       </div>
       <div className="col-span-12 md:col-span-10">
-        <main className="h-full mt-20 flex justify-start m-2">{children}</main>
+        <main className="h-full mt-24 flex justify-start m-2">{children}</main>
       </div>
     </div>
   </div>
@@ -32,6 +37,10 @@ function App() {
         <Route path="/report" element={<ReportPage />} />
         <Route path="/shipments" element={<ShipmentsPage />} />
         <Route path="/summary" element={<SummaryPage />} />
+        <Route path="/customers" element={<CustomersPage />} />
+        <Route path="/vehicle" element={<VehiclePage />} />
+        <Route path="/employee" element={<EmployeePage />} />
+        <Route path="/driver" element={<DriverPage />} />
       </Routes>
     </Layout>
   );
@@ -40,11 +49,13 @@ function App() {
 export default function AppWrapper() {
   return (
     <Router>
-      <ShipmentsProvider>
-        <SummaryProvider>
-          <App />
-        </SummaryProvider>
-      </ShipmentsProvider>
+      <CustomersProvider>
+        <ShipmentsProvider>
+          <SummaryProvider>
+            <App />
+          </SummaryProvider>
+        </ShipmentsProvider>
+      </CustomersProvider>
     </Router>
   );
 }

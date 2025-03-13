@@ -15,6 +15,7 @@ import {
   Users2Icon,
   Folder,
   IdCard,
+  UserCheck,
 } from "lucide-react";
 
 import NavItem from "./NavItem";
@@ -36,16 +37,16 @@ export default function Sidebar() {
   if (isMobile) return null;
 
   return (
-    <div className="flex mt-16  ">
+    <div className="flex mt-20 ">
       {/* Sidebar */}
       <div
         className={`${
           isOpen ? "w-64" : "w-16"
-        } bg-gray-900 h-auto text-white transition-all duration-300 ease-in-out fixed p-2`}
+        } bg-gray-950  h-auto text-white transition-all duration-300 ease-in-out fixed p-2`}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-700 ">
           <h1 className={`text-2xl font-bold ${!isOpen && "hidden"}`}>
-            Logistics
+            Categories
           </h1>
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -93,13 +94,19 @@ export default function Sidebar() {
                     isOpen={isOpen}
                   />
                   <NavItem
+                    to="/customers"
+                    icon={<UserCheck className="w-4 h-4" />}
+                    text="Customers"
+                    isOpen={isOpen}
+                  />
+                  <NavItem
                     to="/Vehicle"
                     icon={<TruckIcon className="w-4 h-4" />}
                     text="Vehicle"
                     isOpen={isOpen}
                   />
                   <NavItem
-                    to="/Report"
+                    to="/report"
                     icon={<ClipboardList className="w-4 h-4" />}
                     text="Report"
                     isOpen={isOpen}
@@ -129,13 +136,13 @@ export default function Sidebar() {
               {userOpen && (
                 <ul className="space-y-1 ml-2">
                   <NavItem
-                    to="/fleetlist"
+                    to="/employee"
                     icon={<Users2Icon className="w-4 h-4" />}
                     text="Employee"
                     isOpen={isOpen}
                   />
                   <NavItem
-                    to="/shipment"
+                    to="/driver"
                     icon={<IdCard className="w-4 h-4" />}
                     text="Driver"
                     isOpen={isOpen}
