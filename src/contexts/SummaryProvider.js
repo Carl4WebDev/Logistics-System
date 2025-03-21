@@ -29,7 +29,7 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       createdBy: "Jone",
       updatedAt: "2025-03-07",
       updatedBy: "Admin",
-      status: "Active",
+      status: "completed",
       file: {
         name: "Sample-Data-1.xlsx",
         data: createExcelBlob([
@@ -46,7 +46,7 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       createdBy: "Doe",
       updatedAt: "2025-03-07",
       updatedBy: "User",
-      status: "Inactive",
+      status: "completed",
       file: {
         name: "sample-data-1.xlsx",
         data: createExcelBlob([
@@ -63,7 +63,7 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       createdBy: "Ivan",
       updatedAt: "2025-03-07",
       updatedBy: "User",
-      status: "Inactive",
+      status: "completed",
       file: {
         name: "sample-data-1.xlsx",
         data: createExcelBlob([
@@ -80,7 +80,7 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       createdBy: "Earl",
       updatedAt: "2025-03-07",
       updatedBy: "User",
-      status: "Inactive",
+      status: "incomplete",
       file: {
         name: "sample-data-1.xlsx",
         data: createExcelBlob([
@@ -97,7 +97,7 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       createdBy: "James",
       updatedAt: "2025-03-07",
       updatedBy: "User",
-      status: "Inactive",
+      status: "completed",
       file: {
         name: "sample-data-1.xlsx",
         data: createExcelBlob([
@@ -114,7 +114,7 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       createdBy: "George",
       updatedAt: "2025-03-07",
       updatedBy: "User",
-      status: "Inactive",
+      status: "completed",
       file: {
         name: "sample-data-1.xlsx",
         data: createExcelBlob([

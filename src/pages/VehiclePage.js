@@ -3,13 +3,7 @@ import React, { useState } from "react";
 const VehiclePage = () => {
   const [vehicles, setVehicles] = useState([
     { id: "V001", type: "Truck", plateNumber: "ABC-123" },
-    { id: "V002", type: "Van", plateNumber: "DEF-456" },
-    { id: "V003", type: "Motorcycle", plateNumber: "GHI-789" },
-    { id: "V004", type: "SUV", plateNumber: "JKL-012" },
-    { id: "V005", type: "Sedan", plateNumber: "MNO-345" },
-    { id: "V006", type: "Pickup", plateNumber: "XYZ-999" },
-    { id: "V007", type: "Bus", plateNumber: "TRN-222" },
-    { id: "V008", type: "Jeepney", plateNumber: "JPN-123" },
+    { id: "V002", type: "Jetplane", plateNumber: "DEF-456" },
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,7 +64,7 @@ const VehiclePage = () => {
         />
 
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
           onClick={() => setIsModalOpen(true)}
         >
           + New Vehicle
@@ -147,7 +141,7 @@ const VehiclePage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white w-3/5 max-h-[80vh] p-6 rounded-lg overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">New Vehicle</h2>
+              <h2 className="text-xl font-bold ">New Vehicle</h2>
               <button
                 className="text-gray-600 hover:text-gray-800"
                 onClick={() => setIsModalOpen(false)}
@@ -173,14 +167,17 @@ const VehiclePage = () => {
                 <label className="block text-sm font-medium">
                   Vehicle Type
                 </label>
-                <input
-                  type="text"
+                <select
                   value={newVehicle.type}
                   onChange={(e) =>
                     setNewVehicle({ ...newVehicle, type: e.target.value })
                   }
                   className="border p-2 w-full rounded"
-                />
+                >
+                  <option value="">Select Type</option>
+                  <option value="Jetplane">Jetplane</option>
+                  <option value="Truck">Truck</option>
+                </select>
               </div>
 
               <div className="col-span-2">
@@ -203,13 +200,13 @@ const VehiclePage = () => {
 
             <div className="mt-4 flex justify-end gap-2">
               <button
-                className="bg-gray-400 text-white px-4 py-2 rounded"
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-700"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
                 onClick={handleAddVehicle}
               >
                 Save

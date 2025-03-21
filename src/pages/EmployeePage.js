@@ -16,34 +16,6 @@ const EmployeePage = () => {
       department: "IT",
       status: "Inactive",
     },
-    {
-      id: 3,
-      name: "Alice Johnson",
-      position: "Designer",
-      department: "Marketing",
-      status: "Active",
-    },
-    {
-      id: 4,
-      name: "Bob Brown",
-      position: "Analyst",
-      department: "Finance",
-      status: "Active",
-    },
-    {
-      id: 5,
-      name: "Charlie White",
-      position: "Clerk",
-      department: "Admin",
-      status: "Inactive",
-    },
-    {
-      id: 6,
-      name: "Daniel Green",
-      position: "Support",
-      department: "Customer Service",
-      status: "Active",
-    },
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,13 +24,16 @@ const EmployeePage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newEmployee, setNewEmployee] = useState({
     name: "",
-    position: "",
-    department: "",
+    position: "Manager",
+    department: "Sales",
     status: "Active",
   });
-  const [searchTerm, setSearchTerm] = useState(""); // New search term state
+  const [searchTerm, setSearchTerm] = useState("");
 
   const itemsPerPage = 5;
+
+  const positions = ["Manager", "Developer", "Designer"];
+  const departments = ["Sales", "IT", "Marketing"];
 
   const filteredData = data.filter((item) =>
     Object.values(item).some((value) =>
@@ -106,15 +81,15 @@ const EmployeePage = () => {
         />
 
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
           onClick={() => setIsAddModalOpen(true)}
         >
           Add New Employee
         </button>
       </div>
 
+      {/* Employee Table */}
       <div className="overflow-x-auto">
-        {/* Table for Larger Screens */}
         <table className="hidden md:table table-auto w-full border-collapse border border-gray-300 text-white">
           <thead>
             <tr>
@@ -128,7 +103,7 @@ const EmployeePage = () => {
               ].map((header) => (
                 <th
                   key={header}
-                  className="border border-gray-300 bg-gray-800 px-4 py-2  min-w-[150px] text-center"
+                  className="border border-gray-300 bg-gray-800 px-4 py-2 text-center"
                 >
                   {header}
                 </th>
@@ -152,7 +127,7 @@ const EmployeePage = () => {
                 </td>
                 <td className="px-4 py-2 text-center">
                   <button
-                    className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                    className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
                     onClick={() => handleEdit(row)}
                   >
                     Edit
@@ -160,7 +135,7 @@ const EmployeePage = () => {
                 </td>
                 <td className="px-4 py-2 text-center">
                   <button
-                    className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                    className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                     onClick={() => handleDelete(row.id)}
                   >
                     Delete
@@ -170,51 +145,9 @@ const EmployeePage = () => {
             ))}
           </tbody>
         </table>
-
-        {/* Column Display for Small Screens */}
-        <div className="md:hidden flex flex-col gap-4">
-          {currentData.map((row, index) => (
-            <div
-              key={index}
-              className="border border-gray-300 p-4 rounded bg-gray-800 text-white"
-            >
-              <p>
-                <strong>Name:</strong> {row.name}
-              </p>
-              <p>
-                <strong>Position:</strong> {row.position}
-              </p>
-              <p>
-                <strong>Department:</strong> {row.department}
-              </p>
-              <p>
-                <strong>Status:</strong>{" "}
-                <span
-                  className={`px-2 py-1 rounded text-white ${
-                    row.status === "Active" ? "bg-green-500" : "bg-red-500"
-                  }`}
-                >
-                  {row.status}
-                </span>
-              </p>
-              <div className="flex gap-2 mt-2">
-                <button
-                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
-                  onClick={() => handleEdit(row)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="bg-red-500 text-white px-3 py-1 rounded text-sm"
-                  onClick={() => handleDelete(row.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
+
+      {/* Edit Employee Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg w-96">
@@ -233,10 +166,8 @@ const EmployeePage = () => {
               className="w-full border border-gray-300 p-2 rounded mb-2"
             />
 
-            <input
-              type="text"
-              placeholder="Position"
-              value={selectedEmployee?.position || ""}
+            <select
+              value={selectedEmployee?.position || "Manager"}
               onChange={(e) =>
                 setSelectedEmployee({
                   ...selectedEmployee,
@@ -244,20 +175,30 @@ const EmployeePage = () => {
                 })
               }
               className="w-full border border-gray-300 p-2 rounded mb-2"
-            />
+            >
+              {positions.map((pos) => (
+                <option key={pos} value={pos}>
+                  {pos}
+                </option>
+              ))}
+            </select>
 
-            <input
-              type="text"
-              placeholder="Department"
-              value={selectedEmployee?.department || ""}
+            <select
+              value={selectedEmployee?.department || "Sales"}
               onChange={(e) =>
                 setSelectedEmployee({
                   ...selectedEmployee,
                   department: e.target.value,
                 })
               }
-              className="w-full border border-gray-300 p-2 rounded mb-2"
-            />
+              className="w-full border border-gray-300 p-2 rounded mb-4"
+            >
+              {departments.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
 
             <select
               value={selectedEmployee?.status || "Active"}
@@ -275,13 +216,13 @@ const EmployeePage = () => {
 
             <div className="flex justify-end gap-2">
               <button
-                className="bg-gray-500 text-white px-4 py-2 rounded"
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
                 onClick={handleSave}
               >
                 Save
@@ -291,6 +232,7 @@ const EmployeePage = () => {
         </div>
       )}
 
+      {/* Add Employee Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg w-96">
@@ -306,25 +248,33 @@ const EmployeePage = () => {
               className="w-full border border-gray-300 p-2 rounded mb-2"
             />
 
-            <input
-              type="text"
-              placeholder="Position"
+            <select
               value={newEmployee.position}
               onChange={(e) =>
                 setNewEmployee({ ...newEmployee, position: e.target.value })
               }
               className="w-full border border-gray-300 p-2 rounded mb-2"
-            />
+            >
+              {positions.map((pos) => (
+                <option key={pos} value={pos}>
+                  {pos}
+                </option>
+              ))}
+            </select>
 
-            <input
-              type="text"
-              placeholder="Department"
+            <select
               value={newEmployee.department}
               onChange={(e) =>
                 setNewEmployee({ ...newEmployee, department: e.target.value })
               }
-              className="w-full border border-gray-300 p-2 rounded mb-2"
-            />
+              className="w-full border border-gray-300 p-2 rounded mb-4"
+            >
+              {departments.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
 
             <select
               value={newEmployee.status}
@@ -339,13 +289,13 @@ const EmployeePage = () => {
 
             <div className="flex justify-end gap-2">
               <button
-                className="bg-gray-500 text-white px-4 py-2 rounded"
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
                 onClick={() => setIsAddModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
                 onClick={handleAddEmployee}
               >
                 Add
@@ -354,11 +304,53 @@ const EmployeePage = () => {
           </div>
         </div>
       )}
-
+      {/* Mobile View (Card Layout) */}
+      <div className="md:hidden">
+        {currentData.map((employee) => (
+          <div
+            key={employee.id}
+            className="border border-gray-300 p-4 rounded-lg mb-2 bg-gray-800 text-white"
+          >
+            <p>
+              <strong>Name:</strong> {employee.name}
+            </p>
+            <p>
+              <strong>Position:</strong> {employee.position}
+            </p>
+            <p>
+              <strong>Department:</strong> {employee.department}
+            </p>
+            <p>
+              <strong>Status:</strong>{" "}
+              <span
+                className={`px-2 py-1 rounded ${
+                  employee.status === "Active" ? "bg-green-500" : "bg-red-500"
+                }`}
+              >
+                {employee.status}
+              </span>
+            </p>
+            <div className="flex justify-end gap-2 mt-2">
+              <button
+                className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700bg-green-500"
+                onClick={() => handleEdit(employee)}
+              >
+                Edit
+              </button>
+              <button
+                className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                onClick={() => handleDelete(employee.id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
       {/* Pagination Controls */}
-      <div className="flex justify-center items-center gap-4 mt-4 z-0">
+      <div className="flex justify-center items-center gap-4 mt-4">
         <button
-          className={`px-3 py-1 rounded bg-gray-500 text-white ${
+          className={`px-3 py-1 rounded bg-gray-500 hover:bg-gray-700 text-white ${
             currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -370,7 +362,7 @@ const EmployeePage = () => {
           Page {currentPage} of {Math.ceil(filteredData.length / itemsPerPage)}
         </span>
         <button
-          className={`px-3 py-1 rounded bg-blue-500 text-white ${
+          className={`px-3 py-1 rounded bg-blue-500 hover:bg-blue-700 text-white ${
             currentPage === Math.ceil(filteredData.length / itemsPerPage)
               ? "opacity-50 cursor-not-allowed"
               : ""

@@ -25,6 +25,10 @@ const ReusableTable = ({
   const [excelFileName, setExcelFileName] = useState("");
   const [selectedExcelId, setSelectedExcelId] = useState(null);
 
+  // description modal
+  const [selectedDescription, setSelectedDescription] = useState("");
+  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
+
   const handleViewFile = (file) => {
     if (!file) return;
 
@@ -212,7 +216,18 @@ const ReusableTable = ({
               currentData.map((row, index) => (
                 <tr key={index} className="border border-gray-300">
                   <td className="p-2 text-wrap">{row.name}</td>
-                  <td className=" text-wrap">{row.description}</td>
+                  <td
+                    className="p-2 max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
+                    onClick={() => {
+                      setSelectedDescription(row.description);
+                      setIsDescriptionModalOpen(true);
+                    }}
+                  >
+                    {row.description.length > 15
+                      ? `${row.description.slice(0, 15)}...`
+                      : row.description}
+                  </td>
+
                   <td className=" text-wrap">{row.createdAt}</td>
                   <td className=" text-wrap">{row.createdBy}</td>
                   <td className=" text-wrap">{row.updatedAt}</td>
@@ -220,7 +235,9 @@ const ReusableTable = ({
                   <td className="">
                     <span
                       className={`px-2 py-1 rounded text-white ${
-                        row.status === "Active" ? "bg-green-500" : "bg-red-500"
+                        row.status === "completed"
+                          ? "bg-green-500"
+                          : "bg-red-500"
                       }`}
                     >
                       {row.status}
@@ -229,7 +246,7 @@ const ReusableTable = ({
                   <td className="">
                     <td className="">
                       <button
-                        className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                        className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
                         onClick={() => {
                           const reader = new FileReader();
 
@@ -260,7 +277,7 @@ const ReusableTable = ({
                   </td>
                   <td className="">
                     <button
-                      className="bg-gray-500 text-white px-3 py-1 rounded text-sm"
+                      className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-700"
                       onClick={() => handleDownload(row.file)}
                     >
                       {row.file.name}
@@ -268,7 +285,7 @@ const ReusableTable = ({
                   </td>
                   <td className="px-4 py-2">
                     <button
-                      className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                      className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
                       onClick={() => {
                         setEditData(row);
                         setIsEditModalOpen(true);
@@ -279,7 +296,7 @@ const ReusableTable = ({
                   </td>
                   <td className="px-4 py-2">
                     <button
-                      className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                      className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                       onClick={() => onDelete(row.id)}
                     >
                       Delete
@@ -300,6 +317,24 @@ const ReusableTable = ({
           </tbody>
         </table>
       </div>
+      {/* Description modal */}
+      {isDescriptionModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white p-6 rounded w-full max-w-md sm:max-w-lg md:w-96">
+            <h2 className="text-lg font-bold mb-4">Full Description</h2>
+            <p className="text-gray-700 break-words">{selectedDescription}</p>
+
+            <div className="mt-4 flex justify-end">
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+                onClick={() => setIsDescriptionModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Excel Viewer Modal */}
       {isExcelModalOpen && (
@@ -432,15 +467,15 @@ const ReusableTable = ({
                 <strong>Status:</strong>{" "}
                 <span
                   className={`px-2 py-1 rounded text-white ${
-                    row.status === "Active" ? "bg-green-500" : "bg-red-500"
+                    row.status === "completed" ? "bg-green-500" : "bg-red-500"
                   }`}
                 >
                   {row.status}
                 </span>
               </p>
-              <div className="flex flex-col md:flex-row gap-2 mt-2">
+              <div className="flex flex-col md:flex-row gap-2 mt-2  overflow-visible">
                 <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm z-10 hover:bg-blue-700"
                   onClick={() => {
                     const reader = new FileReader();
 
@@ -453,28 +488,29 @@ const ReusableTable = ({
                         const sheet = workbook.Sheets[sheetName];
                         const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-                        setSelectedExcelId(row.id); // Track selected file's ID
-                        setExcelTableData(jsonData); // Set data for editing
-                        setExcelFileName(row.file.name); // Set file name for editing
+                        setSelectedExcelId(row.id);
+                        setExcelTableData(jsonData);
+                        setExcelFileName(row.file.name);
                         setIsExcelModalOpen(true);
                       } catch (error) {
                         console.error("Error parsing Excel file:", error);
                       }
                     };
 
-                    reader.readAsArrayBuffer(row.file.data); // Properly read the data as an ArrayBuffer
+                    reader.readAsArrayBuffer(row.file.data);
                   }}
                 >
                   View File
                 </button>
+
                 <button
-                  className="bg-gray-500 text-white px-3 py-1 rounded text-sm"
+                  className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-700"
                   onClick={() => handleDownload(row.file)}
                 >
                   {row.file.name}
                 </button>
                 <button
-                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
                   onClick={() => {
                     setEditData(row);
                     setIsEditModalOpen(true);
@@ -483,7 +519,7 @@ const ReusableTable = ({
                   Edit
                 </button>
                 <button
-                  className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                   onClick={() => onDelete(row.id)}
                 >
                   Delete
@@ -535,12 +571,13 @@ const ReusableTable = ({
               }
               className="border p-2 w-full rounded mb-2"
             >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value="completed">Completed</option>
+              <option value="incomplete">Incomplete</option>
             </select>
 
             {/* File Upload */}
             <input
+              required
               type="file"
               name="file"
               onChange={(e) => {
@@ -568,7 +605,7 @@ const ReusableTable = ({
             {/* Buttons */}
             <div className="flex justify-end">
               <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
                 onClick={() => {
                   handleSaveEdit(editData);
                   setIsEditModalOpen(false);
@@ -577,7 +614,7 @@ const ReusableTable = ({
                 Save Changes
               </button>
               <button
-                className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+                className="bg-gray-500 text-white px-4 py-2 rounded ml-2 hover:bg-gray-700"
                 onClick={() => setIsEditModalOpen(false)}
               >
                 Cancel
@@ -589,7 +626,7 @@ const ReusableTable = ({
       {/* Pagination Controls */}
       <div className="flex justify-center items-center gap-4 mt-4">
         <button
-          className={`px-3 py-1 rounded bg-gray-500 text-white ${
+          className={`px-3 py-1 rounded bg-gray-500 hover:bg-gray-700 text-white ${
             currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -603,7 +640,7 @@ const ReusableTable = ({
         </span>
 
         <button
-          className={`px-3 py-1 rounded bg-blue-500 text-white ${
+          className={`px-3 py-1 rounded bg-blue-500 hover:bg-blue-700 text-white ${
             currentPage === Math.ceil(filteredData.length / itemsPerPage)
               ? "opacity-50 cursor-not-allowed"
               : ""

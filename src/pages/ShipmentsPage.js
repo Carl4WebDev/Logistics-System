@@ -28,32 +28,73 @@ const ShipmentsPage = () => {
     name: "",
     description: "",
     createdBy: "",
-    status: "Active",
+    status: "incomplete",
   });
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file); // Read file as an ArrayBuffer
-      reader.onload = (event) => {
-        const fileBlob = new Blob([event.target.result], { type: file.type });
 
-        setNewShipments((prev) => ({
-          ...prev,
-          file: {
-            name: file.name,
-            data: fileBlob,
-          },
-        }));
-      };
+    if (!file) {
+      setErrors((prev) => ({ ...prev, file: "Please select a file." }));
+      return;
     }
+
+    const validFileTypes = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+    ];
+    if (!validFileTypes.includes(file.type)) {
+      setErrors((prev) => ({
+        ...prev,
+        file: "Invalid file type. Please upload an Excel file (.xlsx or .xls).",
+      }));
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setErrors((prev) => ({
+        ...prev,
+        file: "File size exceeds 5MB. Please upload a smaller file.",
+      }));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = (event) => {
+      const fileBlob = new Blob([event.target.result], { type: file.type });
+
+      setNewShipments((prev) => ({
+        ...prev,
+        file: {
+          name: file.name,
+          data: fileBlob,
+        },
+      }));
+
+      setErrors((prev) => ({ ...prev, file: "" })); // Clear error on valid file
+    };
   };
 
   // Function to handle new data from the form inside ReusableTable
+  const [errors, setErrors] = useState({
+    name: "",
+    createdBy: "",
+    file: "",
+  });
+
   const handleCreateNew = () => {
-    if (!newShipments.name || !newShipments.createdBy) {
-      alert("Please fill in all required fields.");
+    const { name, createdBy, file } = newShipments;
+    const newErrors = {
+      name: !name ? "Name is required." : "",
+      createdBy: !createdBy ? "Creator name is required." : "",
+      file: !file ? "Please upload an Excel file." : "",
+    };
+
+    // Check for any errors
+    if (newErrors.name || newErrors.createdBy || newErrors.file) {
+      setErrors(newErrors);
       return;
     }
 
@@ -62,18 +103,22 @@ const ShipmentsPage = () => {
       ...newShipments,
       createdAt: new Date().toISOString().split("T")[0],
       updatedAt: new Date().toISOString().split("T")[0],
-      updatedBy: newShipments.createdBy,
+      updatedBy: createdBy,
     };
 
     setShipmentsData((prevData) => [...prevData, newEntry]);
     setIsModalOpen(false);
+
+    // Reset form and clear errors
     setNewShipments({
       name: "",
       description: "",
       createdBy: "",
-      status: "Active",
+      status: "incomplete",
       file: null,
     });
+
+    setErrors({ name: "", createdBy: "", file: "" }); // Clear errors
   };
 
   // Handle Edit Function
@@ -113,7 +158,7 @@ const ShipmentsPage = () => {
       <div className="flex justify-between items-center mb-4 ">
         <h2 className="text-3xl text-white font-bold">Shipments</h2>
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
           onClick={() => setIsModalOpen(true)}
         >
           + New Shipments
@@ -157,6 +202,9 @@ const ShipmentsPage = () => {
                   }
                   className="border p-2 w-full rounded"
                 />
+                {errors.name && (
+                  <p className="text-red-500 text-sm mt-2">{errors.name}</p>
+                )}
               </div>
 
               <div>
@@ -173,6 +221,11 @@ const ShipmentsPage = () => {
                   }
                   className="border p-2 w-full rounded"
                 />
+                {errors.createdBy && (
+                  <p className="text-red-500 text-sm mt-2">
+                    {errors.createdBy}
+                  </p>
+                )}
               </div>
 
               <div className="col-span-2">
@@ -200,8 +253,8 @@ const ShipmentsPage = () => {
                   }
                   className="border p-2 w-full rounded"
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="Completed">Completed</option>
+                  <option value="incomplete">Incomplete</option>
                 </select>
               </div>
             </div>
@@ -212,23 +265,27 @@ const ShipmentsPage = () => {
                 Upload Excel File
               </label>
               <input
+                required
                 type="file"
                 accept=".xlsx, .xls"
                 className="border p-2 w-full rounded"
                 onChange={handleFileChange}
               />
+              {errors.file && (
+                <p className="text-red-500 text-sm mt-2">{errors.file}</p>
+              )}
             </div>
 
             {/* Buttons */}
             <div className="mt-4 flex justify-end gap-2">
               <button
-                className="bg-gray-400 text-white px-4 py-2 rounded"
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-700"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
                 onClick={handleCreateNew}
               >
                 Save

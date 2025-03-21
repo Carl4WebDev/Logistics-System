@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 
 import NavItem from "../Sidebar/NavItem";
 
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 import logiTrack from "../../assets/images/logiTrack-bg.jpg";
 
 import {
@@ -24,6 +27,14 @@ import {
 } from "lucide-react";
 
 export default function Navbar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login"); // Redirect to login page
+  };
+
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
@@ -41,7 +52,7 @@ export default function Navbar() {
   return (
     <nav className="bg-gray-950  text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
       {/* Left Side: Logo */}
-      <div className="font-bold flex ml-2 items-center justify-center">
+      <div className="font-bold flex ml-2 items-center justify-between">
         <img
           src={logiTrack}
           width={"50px"}
@@ -50,6 +61,11 @@ export default function Navbar() {
         />
         <h1 className="ml-2 text-2xl">LogiTrack</h1>
       </div>
+      {user && (
+        <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded">
+          Logout
+        </button>
+      )}
 
       {/* Mobile Menu Button */}
       {isMobile && (
@@ -147,13 +163,13 @@ export default function Navbar() {
                 {userOpen && (
                   <ul className="space-y-1 ml-2">
                     <NavItem
-                      to="/fleetlist"
+                      to="/employee"
                       icon={<Users2Icon className="w-4 h-4" />}
                       text="Employee"
                       isOpen={isOpen}
                     />
                     <NavItem
-                      to="/shipment"
+                      to="/driver"
                       icon={<IdCard className="w-4 h-4" />}
                       text="Driver"
                       isOpen={isOpen}

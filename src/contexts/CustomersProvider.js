@@ -29,7 +29,7 @@ export const CustomersProvider = ({ children, initialData = [] }) => {
       createdBy: "John",
       updatedAt: "2025-03-07",
       updatedBy: "Admin",
-      status: "Active",
+      status: "completed",
       file: {
         name: "customer-sample-1.xlsx",
         data: createExcelBlob([
@@ -46,7 +46,7 @@ export const CustomersProvider = ({ children, initialData = [] }) => {
       createdBy: "Doe",
       updatedAt: "2025-03-07",
       updatedBy: "User",
-      status: "Inactive",
+      status: "completed",
       file: {
         name: "customer-sample-2.xlsx",
         data: createExcelBlob([

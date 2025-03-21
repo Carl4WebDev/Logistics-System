@@ -5,5 +5,13 @@ module.exports = {
   theme: {
     extend: {},
   },
+  variants: {
+    extend: {
+      scale: ["hover"],
+      backgroundColor: ["hover"],
+      opacity: ["hover"],
+      ring: ["hover"],
+    },
+  },
   plugins: [],
-}
+};

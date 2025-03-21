@@ -3,18 +3,20 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Sidebar from "./components/Sidebar/Sidebar";
 import DashboardPage from "./pages/DashboardPage";
-// import Footer from './components/Foooter/Footer'
 import ReportPage from "./pages/ReportPage";
 import ShipmentsPage from "./pages/ShipmentsPage";
 import SummaryPage from "./pages/SummaryPage";
-import { SummaryProvider } from "./contexts/SummaryProvider"; // Correct import
-import { ShipmentsProvider } from "./contexts/ShipmentsProvider"; // Correct import
-import { CustomersProvider } from "./contexts/CustomersProvider"; // Correct import
 import CustomersPage from "./pages/CustomersPage";
 import VehiclePage from "./pages/VehiclePage";
 import EmployeePage from "./pages/EmployeePage";
 import DriverPage from "./pages/DriverPage";
+import LoginPage from "./pages/LoginPage"; // New Login Page
+import ProtectedRoute from "./components/ProctectedRoute/ProtectedRoute";
+import { AuthProvider } from "../src/contexts/AuthContext";
 
+import { CustomersProvider } from "./contexts/CustomersProvider";
+import { SummaryProvider } from "./contexts/SummaryProvider";
+import { ShipmentsProvider } from "./contexts/ShipmentsProvider";
 const Layout = ({ children }) => (
   <div className="w-full h-screen">
     <Header />
@@ -34,13 +36,66 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<DashboardPage />} />
-        <Route path="/report" element={<ReportPage />} />
-        <Route path="/shipments" element={<ShipmentsPage />} />
-        <Route path="/summary" element={<SummaryPage />} />
-        <Route path="/customers" element={<CustomersPage />} />
-        <Route path="/vehicle" element={<VehiclePage />} />
-        <Route path="/employee" element={<EmployeePage />} />
-        <Route path="/driver" element={<DriverPage />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/report"
+          element={
+            <ProtectedRoute element={<ReportPage />} allowedRoles={["admin"]} />
+          }
+        />
+        <Route
+          path="/shipments"
+          element={
+            <ProtectedRoute
+              element={<ShipmentsPage />}
+              allowedRoles={["admin"]}
+            />
+          }
+        />
+        <Route
+          path="/summary"
+          element={
+            <ProtectedRoute
+              element={<SummaryPage />}
+              allowedRoles={["admin"]}
+            />
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <ProtectedRoute
+              element={<CustomersPage />}
+              allowedRoles={["admin", "customer"]}
+            />
+          }
+        />
+        <Route
+          path="/vehicle"
+          element={
+            <ProtectedRoute
+              element={<VehiclePage />}
+              allowedRoles={["admin"]}
+            />
+          }
+        />
+        <Route
+          path="/employee"
+          element={
+            <ProtectedRoute
+              element={<EmployeePage />}
+              allowedRoles={["admin"]}
+            />
+          }
+        />
+        <Route
+          path="/driver"
+          element={
+            <ProtectedRoute element={<DriverPage />} allowedRoles={["admin"]} />
+          }
+        />
       </Routes>
     </Layout>
   );
@@ -49,13 +104,15 @@ function App() {
 export default function AppWrapper() {
   return (
     <Router>
-      <CustomersProvider>
-        <ShipmentsProvider>
-          <SummaryProvider>
-            <App />
-          </SummaryProvider>
-        </ShipmentsProvider>
-      </CustomersProvider>
+      <AuthProvider>
+        <CustomersProvider>
+          <ShipmentsProvider>
+            <SummaryProvider>
+              <App />
+            </SummaryProvider>
+          </ShipmentsProvider>
+        </CustomersProvider>
+      </AuthProvider>
     </Router>
   );
 }

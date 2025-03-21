@@ -6,21 +6,7 @@ const DriverPage = () => {
       id: 1,
       name: "Alex Turner",
       licenseNumber: "D12345",
-      vehicleAssigned: "Truck 01",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Chris Martin",
-      licenseNumber: "D67890",
-      vehicleAssigned: "Van 12",
-      status: "Inactive",
-    },
-    {
-      id: 3,
-      name: "Eddie Vedder",
-      licenseNumber: "D54321",
-      vehicleAssigned: "Truck 03",
+      vehicleAssigned: "Truck 1",
       status: "Active",
     },
   ]);
@@ -54,7 +40,10 @@ const DriverPage = () => {
   const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleEdit = (driver) => {
-    setSelectedDriver(driver);
+    setSelectedDriver({
+      ...driver,
+      vehicleAssigned: driver.vehicleAssigned || "", // Ensure this is set
+    });
     setIsModalOpen(true);
   };
 
@@ -85,7 +74,7 @@ const DriverPage = () => {
         />
 
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
           onClick={() => setIsAddModalOpen(true)}
         >
           Add New Driver
@@ -96,6 +85,7 @@ const DriverPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none">
           <div className="bg-white p-6 rounded w-96 pointer-events-auto">
             <h2 className="text-lg font-bold mb-4">Edit Driver</h2>
+
             <input
               type="text"
               placeholder="Name"
@@ -105,12 +95,29 @@ const DriverPage = () => {
               }
               className="border border-gray-300 p-2 w-full mb-2"
             />
+
+            <select
+              value={selectedDriver?.vehicleAssigned || ""}
+              onChange={(e) =>
+                setSelectedDriver({
+                  ...selectedDriver,
+                  vehicleAssigned: e.target.value,
+                })
+              }
+              className="border border-gray-300 p-2 w-full mb-2"
+            >
+              <option value="">Select Vehicle</option>
+              <option value="Truck 1">Truck 1</option>
+              <option value="Sedan 2">Sedan 2</option>
+            </select>
+
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded"
               onClick={handleSave}
             >
               Save
             </button>
+
             <button
               className="bg-gray-400 text-white px-4 py-2 rounded ml-2"
               onClick={() => setIsModalOpen(false)}
@@ -160,7 +167,7 @@ const DriverPage = () => {
                 </td>
                 <td className="px-4 py-2 text-center">
                   <button
-                    className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                    className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
                     onClick={() => handleEdit(row)}
                   >
                     Edit
@@ -168,7 +175,7 @@ const DriverPage = () => {
                 </td>
                 <td className="px-4 py-2 text-center">
                   <button
-                    className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                    className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                     onClick={() => handleDelete(row.id)}
                   >
                     Delete
@@ -179,6 +186,7 @@ const DriverPage = () => {
           </tbody>
         </table>
 
+        {/* Edit modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
             <div className="bg-white p-6 rounded w-96 pointer-events-auto">
@@ -216,6 +224,22 @@ const DriverPage = () => {
                 }
                 className="border border-gray-300 p-2 w-full mb-2"
               />
+
+              <select
+                value={selectedDriver?.vehicleAssigned || ""}
+                onChange={(e) =>
+                  setSelectedDriver({
+                    ...selectedDriver,
+                    vehicleAssigned: e.target.value,
+                  })
+                }
+                className="border border-gray-300 p-2 w-full mb-2"
+              >
+                <option value="">Select Vehicle</option>
+                <option value="Truck 1">Truck 1</option>
+                <option value="Jetplane 2">Jetplane 2</option>{" "}
+                {/* Add if needed */}
+              </select>
               <select
                 value={selectedDriver?.status || ""}
                 onChange={(e) =>
@@ -230,13 +254,13 @@ const DriverPage = () => {
                 <option value="Inactive">Inactive</option>
               </select>
               <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
                 onClick={handleSave}
               >
                 Save
               </button>
               <button
-                className="bg-gray-400 text-white px-4 py-2 rounded ml-2"
+                className="bg-gray-400 text-white px-4 py-2 rounded ml-2 hover:bg-gray-700"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
@@ -248,7 +272,7 @@ const DriverPage = () => {
         {isAddModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
             <div className="bg-white p-6 rounded w-96 pointer-events-auto">
-              <h2 className="text-lg font-bold mb-4">Add New Driver</h2>
+              <h2 className="text-lg font-bold mb-4 ">Add New Driver</h2>
               <input
                 type="text"
                 placeholder="Name"
@@ -267,9 +291,7 @@ const DriverPage = () => {
                 }
                 className="border border-gray-300 p-2 w-full mb-2"
               />
-              <input
-                type="text"
-                placeholder="Vehicle Assigned"
+              <select
                 value={newDriver.vehicleAssigned}
                 onChange={(e) =>
                   setNewDriver({
@@ -278,7 +300,11 @@ const DriverPage = () => {
                   })
                 }
                 className="border border-gray-300 p-2 w-full mb-2"
-              />
+              >
+                <option value="">Select Vehicle</option>
+                <option value="Truck 1">Truck 1</option>
+                <option value="Jetplane 2">Jetplane 2</option>
+              </select>
               <select
                 value={newDriver.status}
                 onChange={(e) =>
@@ -333,13 +359,13 @@ const DriverPage = () => {
               </p>
               <div className="flex gap-2 mt-2">
                 <button
-                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
                   onClick={() => handleEdit(row)}
                 >
                   Edit
                 </button>
                 <button
-                  className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                   onClick={() => handleDelete(row.id)}
                 >
                   Delete
@@ -353,7 +379,7 @@ const DriverPage = () => {
       {/* Pagination Controls */}
       <div className="flex justify-center items-center gap-4 mt-4">
         <button
-          className={`px-3 py-1 rounded bg-gray-500 text-white ${
+          className={`px-3 py-1 rounded bg-gray-500 hover:bg-gray-700 text-white ${
             currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -365,7 +391,7 @@ const DriverPage = () => {
           Page {currentPage} of {Math.ceil(filteredData.length / itemsPerPage)}
         </span>
         <button
-          className={`px-3 py-1 rounded bg-blue-500 text-white ${
+          className={`px-3 py-1 rounded bg-blue-500 hover:bg-blue-700 text-white ${
             currentPage === Math.ceil(filteredData.length / itemsPerPage)
               ? "opacity-50 cursor-not-allowed"
               : ""
