@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
-
 import NavItem from "../Sidebar/NavItem";
-
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-
 import logiTrack from "../../assets/images/logiTrack-bg.jpg";
-
 import {
   Menu,
   X,
@@ -27,19 +23,19 @@ import {
 } from "lucide-react";
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuth(); // Get user and logout function from AuthContext
   const navigate = useNavigate();
 
+  // Handle logout
   const handleLogout = () => {
     logout();
     navigate("/"); // Redirect to login page
   };
 
+  // State for mobile menu and dropdowns
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
-
-  const [isOpen, setIsOpen] = useState(true);
   const [logisticsOpen, setLogisticsOpen] = useState(false);
 
   // Detect screen size change
@@ -50,7 +46,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-gray-950  text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
+    <nav className="bg-gray-950 text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
       {/* Left Side: Logo */}
       <div className="font-bold flex ml-2 items-center justify-between">
         <img
@@ -58,16 +54,30 @@ export default function Navbar() {
           width={"50px"}
           height={"50px"}
           className="rounded-full"
+          alt="LogiTrack Logo"
         />
         <h1 className="ml-2 text-2xl">LogiTrack</h1>
       </div>
+
+      {/* Greeting and Logout Button (Visible when user is logged in) */}
       {user && (
-        <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded">
-          Logout
-        </button>
+        <div className="flex items-center gap-4">
+          {/* Greeting */}
+          <span className="text-lg">
+            Hi, {user?.fullName || user?.username || "User"}!
+          </span>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 px-3 py-1 rounded"
+          >
+            Logout
+          </button>
+        </div>
       )}
 
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button (Visible only on mobile) */}
       {isMobile && (
         <button
           onClick={() => setMenuOpen(!menuOpen)}
@@ -77,13 +87,14 @@ export default function Navbar() {
         </button>
       )}
 
-      {/* Sidebar (Only Visible in Mobile Mode) */}
+      {/* Mobile Sidebar (Visible only on mobile when menu is open) */}
       {isMobile && menuOpen && (
-        <div className="absolute top-24  left-0 w-64 bg-gray-900 h-screen p-4 text-white">
+        <div className="absolute top-24 left-0 w-64 bg-gray-900 h-screen p-4 text-white">
           <nav className="mt-4">
             <h1 className="text-2xl">Categories</h1>
-            <hr></hr>
+            <hr />
             <ul className="space-y-2">
+              {/* Dashboard Link (Visible to all roles) */}
               <NavItem
                 to="/dashboard"
                 icon={<Home />}
@@ -91,97 +102,130 @@ export default function Navbar() {
                 isOpen={true}
               />
 
-              {/* Logistic Management Dropdown */}
-              <li>
-                <div
-                  className={`flex items-center justify-between hover:bg-gray-800 p-2 rounded-md`}
-                  onClick={() => setLogisticsOpen(!logisticsOpen)}
-                >
-                  <div className="flex items-center">
-                    <Warehouse className="w-5 h-5 ml-3" />
-                    {isOpen && (
+              {/* Logistic Management Dropdown (Visible to admin and coordinator) */}
+              {(user?.role === "admin" || user?.role === "coordinator") && (
+                <li>
+                  <div
+                    className={`flex items-center justify-between hover:bg-gray-800 p-2 rounded-md`}
+                    onClick={() => setLogisticsOpen(!logisticsOpen)}
+                  >
+                    <div className="flex items-center">
+                      <Warehouse className="w-5 h-5 ml-3" />
                       <span className="ml-2">Logistic Management</span>
+                    </div>
+                    {logisticsOpen ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
                     )}
                   </div>
-                  {isOpen &&
-                    (logisticsOpen ? (
+
+                  {/* Logistic Management Submenu */}
+                  {logisticsOpen && (
+                    <ul className="ml-2 space-y-1">
+                      {/* Summary (Visible to admin and coordinator) */}
+                      {(user?.role === "admin" ||
+                        user?.role === "coordinator") && (
+                        <NavItem
+                          to="/summary"
+                          icon={<Folder className="w-4 h-4" />}
+                          text="Summary"
+                          isOpen={true}
+                        />
+                      )}
+
+                      {/* Shipments (Visible to admin and coordinator) */}
+                      {(user?.role === "admin" ||
+                        user?.role === "coordinator") && (
+                        <NavItem
+                          to="/shipments"
+                          icon={<Package className="w-4 h-4" />}
+                          text="Shipments"
+                          isOpen={true}
+                        />
+                      )}
+
+                      {/* Customers (Visible only to admin) */}
+                      {user?.role === "admin" && (
+                        <NavItem
+                          to="/customers"
+                          icon={<UserCheck className="w-4 h-4" />}
+                          text="Customers"
+                          isOpen={true}
+                        />
+                      )}
+
+                      {/* Vehicle (Visible only to admin) */}
+                      {user?.role === "admin" && (
+                        <NavItem
+                          to="/vehicle"
+                          icon={<TruckIcon className="w-4 h-4" />}
+                          text="Vehicle"
+                          isOpen={true}
+                        />
+                      )}
+
+                      {/* Report (Visible only to admin) */}
+                      {user?.role === "admin" && (
+                        <NavItem
+                          to="/report"
+                          icon={<ClipboardList className="w-4 h-4" />}
+                          text="Report"
+                          isOpen={true}
+                        />
+                      )}
+                    </ul>
+                  )}
+                </li>
+              )}
+
+              {/* User Management Dropdown (Visible only to admin) */}
+              {user?.role === "admin" && (
+                <li>
+                  <div
+                    className={`flex items-center justify-between hover:bg-gray-800 p-2 rounded-md`}
+                    onClick={() => setUserOpen(!userOpen)}
+                  >
+                    <div className="flex items-center">
+                      <User2Icon className="w-5 h-5 ml-3" />
+                      <span className="ml-2">User Management</span>
+                    </div>
+                    {userOpen ? (
                       <ChevronDown size={16} />
                     ) : (
                       <ChevronRight size={16} />
-                    ))}
-                </div>
-
-                {logisticsOpen && (
-                  <ul className="ml-2 space-y-1">
-                    <NavItem
-                      to="/summary"
-                      icon={<Folder className="w-4 h-4" />}
-                      text="Summary"
-                      isOpen={isOpen}
-                    />
-                    <NavItem
-                      to="/shipments"
-                      icon={<Package className="w-4 h-4" />}
-                      text="Shipments"
-                      isOpen={isOpen}
-                    />
-                    <NavItem
-                      to="/customers"
-                      icon={<UserCheck className="w-4 h-4" />}
-                      text="Customers"
-                      isOpen={isOpen}
-                    />
-                    <NavItem
-                      to="/Vehicle"
-                      icon={<TruckIcon className="w-4 h-4" />}
-                      text="Vehicle"
-                      isOpen={isOpen}
-                    />
-                    <NavItem
-                      to="/Report"
-                      icon={<ClipboardList className="w-4 h-4" />}
-                      text="Report"
-                      isOpen={isOpen}
-                    />
-                  </ul>
-                )}
-              </li>
-
-              {/* User Management Dropdown */}
-              <li>
-                <div
-                  className={`flex items-center justify-between hover:bg-gray-800 p-2 rounded-md`}
-                  onClick={() => setUserOpen(!userOpen)}
-                >
-                  <div className="flex items-center">
-                    <User2Icon className="w-5 h-5 ml-3" />
-                    {isOpen && <span className="ml-2">User Management</span>}
+                    )}
                   </div>
-                  {isOpen &&
-                    (userOpen ? (
-                      <ChevronDown size={16} />
-                    ) : (
-                      <ChevronRight size={16} />
-                    ))}
-                </div>
 
-                {userOpen && (
-                  <ul className="space-y-1 ml-2">
-                    <NavItem
-                      to="/employee"
-                      icon={<Users2Icon className="w-4 h-4" />}
-                      text="Employee"
-                      isOpen={isOpen}
-                    />
-                    <NavItem
-                      to="/driver"
-                      icon={<IdCard className="w-4 h-4" />}
-                      text="Driver"
-                      isOpen={isOpen}
-                    />
-                  </ul>
-                )}
-              </li>
+                  {/* User Management Submenu */}
+                  {userOpen && (
+                    <ul className="space-y-1 ml-2">
+                      <NavItem
+                        to="/employee"
+                        icon={<Users2Icon className="w-4 h-4" />}
+                        text="Employee"
+                        isOpen={true}
+                      />
+                      <NavItem
+                        to="/driver"
+                        icon={<IdCard className="w-4 h-4" />}
+                        text="Driver"
+                        isOpen={true}
+                      />
+                    </ul>
+                  )}
+                </li>
+              )}
+
+              {/* Driver Page (Visible only to driver) */}
+              {user?.role === "driver" && (
+                <NavItem
+                  to="/driver"
+                  icon={<IdCard />}
+                  text="Driver Page"
+                  isOpen={true}
+                />
+              )}
             </ul>
           </nav>
         </div>

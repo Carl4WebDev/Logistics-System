@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Header from "./components/Header/Header";
 import Sidebar from "./components/Sidebar/Sidebar";
 import DashboardPage from "./pages/DashboardPage";
@@ -10,14 +15,14 @@ import CustomersPage from "./pages/CustomersPage";
 import VehiclePage from "./pages/VehiclePage";
 import EmployeePage from "./pages/EmployeePage";
 import DriverPage from "./pages/DriverPage";
-import LoginPage from "./pages/LoginPage"; // New Login Page
-import ProtectedRoute from "./components/ProctectedRoute/ProtectedRoute";
+import AuthPage from "./pages/Authpage"; // Replace LoginPage and RegisterPage with AuthPage
+import ProtectedRoute from "../src/components/ProctectedRoute/ProtectedRoute";
 import { AuthProvider } from "../src/contexts/AuthContext";
-
-import { CustomersProvider } from "./contexts/CustomersProvider";
-import { SummaryProvider } from "./contexts/SummaryProvider";
-import { ShipmentsProvider } from "./contexts/ShipmentsProvider";
+import { CustomersProvider } from "../src/contexts/CustomersProvider";
+import { SummaryProvider } from "../src/contexts/SummaryProvider";
+import { ShipmentsProvider } from "../src/contexts/ShipmentsProvider";
 import Accounts from "./pages/Accounts";
+
 const Layout = ({ children }) => (
   <div className="w-full h-screen">
     <Header />
@@ -36,10 +41,22 @@ function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        {/* Auth Page (Combined Login + Register) */}
+        <Route path="/auth" element={<AuthPage />} />
+
+        {/* Default Route (Redirect to Auth Page) */}
+        <Route path="/" element={<Navigate to="/auth" replace />} />
 
         {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute
+              element={<DashboardPage />}
+              allowedRoles={["admin", "coordinator", "driver"]}
+            />
+          }
+        />
         <Route
           path="/report"
           element={
@@ -51,7 +68,7 @@ function App() {
           element={
             <ProtectedRoute
               element={<ShipmentsPage />}
-              allowedRoles={["admin"]}
+              allowedRoles={["admin", "coordinator"]}
             />
           }
         />
@@ -60,7 +77,7 @@ function App() {
           element={
             <ProtectedRoute
               element={<SummaryPage />}
-              allowedRoles={["admin"]}
+              allowedRoles={["admin", "coordinator"]}
             />
           }
         />
@@ -69,7 +86,7 @@ function App() {
           element={
             <ProtectedRoute
               element={<CustomersPage />}
-              allowedRoles={["admin", "customer"]}
+              allowedRoles={["admin"]}
             />
           }
         />
@@ -94,7 +111,10 @@ function App() {
         <Route
           path="/driver"
           element={
-            <ProtectedRoute element={<DriverPage />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<DriverPage />}
+              allowedRoles={["admin", "driver"]}
+            />
           }
         />
         <Route

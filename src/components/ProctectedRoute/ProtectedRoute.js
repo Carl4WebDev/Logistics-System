@@ -3,17 +3,19 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 const ProtectedRoute = ({ element, allowedRoles }) => {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Get the current user from AuthContext
 
+  // If user is not logged in, redirect to login page
   if (!user) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
+  // If user's role is not allowed, redirect to a default page (e.g., dashboard)
   if (!allowedRoles.includes(user.role)) {
-    alert("Access Denied: You don't have permission to view this page.");
-    return <Navigate to="/" />;
+    return <Navigate to="/dashboard" replace />;
   }
 
+  // If user is authorized, render the element
   return element;
 };
 
