@@ -59,7 +59,12 @@ export default function Sidebar() {
         {/* Navigation Links */}
         <nav className="mt-4">
           <ul className="space-y-2">
-            <NavItem to="/" icon={<Home />} text="Dashboard" isOpen={isOpen} />
+            <NavItem
+              to="/dashboard"
+              icon={<Home />}
+              text="Dashboard"
+              isOpen={isOpen}
+            />
 
             {/* Logistic Management Dropdown */}
             <li>
@@ -136,9 +141,9 @@ export default function Sidebar() {
               {userOpen && (
                 <ul className="space-y-1 ml-2">
                   <NavItem
-                    to="/employee"
+                    to="/accounts"
                     icon={<Users2Icon className="w-4 h-4" />}
-                    text="Employee"
+                    text="Accounts"
                     isOpen={isOpen}
                   />
                   <NavItem

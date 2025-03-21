@@ -32,7 +32,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login"); // Redirect to login page
+    navigate("/"); // Redirect to login page
   };
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -84,7 +84,12 @@ export default function Navbar() {
             <h1 className="text-2xl">Categories</h1>
             <hr></hr>
             <ul className="space-y-2">
-              <NavItem to="/" icon={<Home />} text="Dashboard" isOpen={true} />
+              <NavItem
+                to="/dashboard"
+                icon={<Home />}
+                text="Dashboard"
+                isOpen={true}
+              />
 
               {/* Logistic Management Dropdown */}
               <li>

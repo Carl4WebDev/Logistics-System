@@ -17,6 +17,7 @@ import { AuthProvider } from "../src/contexts/AuthContext";
 import { CustomersProvider } from "./contexts/CustomersProvider";
 import { SummaryProvider } from "./contexts/SummaryProvider";
 import { ShipmentsProvider } from "./contexts/ShipmentsProvider";
+import Accounts from "./pages/Accounts";
 const Layout = ({ children }) => (
   <div className="w-full h-screen">
     <Header />
@@ -35,8 +36,8 @@ function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
 
         {/* Protected Routes */}
         <Route
@@ -94,6 +95,12 @@ function App() {
           path="/driver"
           element={
             <ProtectedRoute element={<DriverPage />} allowedRoles={["admin"]} />
+          }
+        />
+        <Route
+          path="/accounts"
+          element={
+            <ProtectedRoute element={<Accounts />} allowedRoles={["admin"]} />
           }
         />
       </Routes>
