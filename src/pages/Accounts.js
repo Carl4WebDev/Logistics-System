@@ -1,61 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useAuth } from "../contexts/AuthContext"; // Adjust the path as needed
 
 const Accounts = () => {
-  // Sample user data
-  const initialUsers = [
-    { id: 1, fullName: "John Doe", email: "john@example.com", role: "driver" },
-    {
-      id: 2,
-      fullName: "Jane Smith",
-      email: "jane@example.com",
-      role: "coordinator",
-    },
-    {
-      id: 3,
-      fullName: "Admin User",
-      email: "admin@example.com",
-      role: "admin",
-    },
-    { id: 4, fullName: "Mark Lee", email: "mark@example.com", role: "driver" },
-    {
-      id: 5,
-      fullName: "Emily Davis",
-      email: "emily@example.com",
-      role: "coordinator",
-    },
-    {
-      id: 6,
-      fullName: "Chris Brown",
-      email: "chris@example.com",
-      role: "driver",
-    },
-  ];
+  // Access global state and functions from AuthContext
+  const { mockUsers, updateUserRole, deleteUser } = useAuth();
 
-  // State for users, search, and pagination
-  const [users, setUsers] = useState(initialUsers);
+  // State for search and pagination
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5; // Adjust as needed
 
+  // State for delete confirmation modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null); // State to store the user to delete
+
   // Handle role update
   const handleRoleChange = (id, newRole) => {
-    setUsers(
-      users.map((user) => (user.id === id ? { ...user, role: newRole } : user))
-    );
+    updateUserRole(id, newRole); // Update role globally
   };
 
   // Handle account deletion
   const handleDeleteUser = (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this user?"
-    );
-    if (confirmDelete) {
-      setUsers(users.filter((user) => user.id !== id));
-    }
+    deleteUser(id); // Delete user globally
+    setIsDeleteModalOpen(false); // Close the delete confirmation modal
   };
 
   // Filter users based on search query (name, email, or role)
-  const filteredUsers = users.filter(
+  const filteredUsers = mockUsers.filter(
     (user) =>
       user.fullName.toLowerCase().includes(search.toLowerCase()) ||
       user.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -78,6 +49,30 @@ const Accounts = () => {
           className="border border-gray-300 p-2 rounded w-1/3 mr-4"
         />
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
+          <div className="bg-white p-6 rounded w-96 pointer-events-auto">
+            <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
+            <p>Are you sure you want to delete this user?</p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+                onClick={() => handleDeleteUser(userToDelete)}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-700"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="overflow-x-auto">
         {/* Table for Larger Screens */}
@@ -113,7 +108,10 @@ const Accounts = () => {
                 <td className="px-4 py-2 text-center">
                   <button
                     className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                    onClick={() => handleDeleteUser(user.id)}
+                    onClick={() => {
+                      setUserToDelete(user.id); // Set the user to delete
+                      setIsDeleteModalOpen(true); // Open the delete confirmation modal
+                    }}
                   >
                     Delete
                   </button>
@@ -151,7 +149,10 @@ const Accounts = () => {
               <div className="flex gap-2 mt-2">
                 <button
                   className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                  onClick={() => handleDeleteUser(user.id)}
+                  onClick={() => {
+                    setUserToDelete(user.id); // Set the user to delete
+                    setIsDeleteModalOpen(true); // Open the delete confirmation modal
+                  }}
                 >
                   Delete
                 </button>

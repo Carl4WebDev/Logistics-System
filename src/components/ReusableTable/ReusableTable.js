@@ -9,7 +9,7 @@ const ReusableTable = ({
   onDelete,
   setTableData,
 }) => {
-  //pagination
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Change this value if you want to modify items per page
 
@@ -25,9 +25,13 @@ const ReusableTable = ({
   const [excelFileName, setExcelFileName] = useState("");
   const [selectedExcelId, setSelectedExcelId] = useState(null);
 
-  // description modal
+  // Description modal
   const [selectedDescription, setSelectedDescription] = useState("");
   const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
+
+  // Delete confirmation modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState(null); // State to store the row to delete
 
   const handleViewFile = (file) => {
     if (!file) return;
@@ -50,6 +54,7 @@ const ReusableTable = ({
     };
     reader.readAsArrayBuffer(file.data);
   };
+
   const handleSaveExcelData = () => {
     const worksheet = XLSX.utils.json_to_sheet(excelTableData);
     const workbook = XLSX.utils.book_new();
@@ -181,6 +186,33 @@ const ReusableTable = ({
         />
       </div>
 
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
+          <div className="bg-white p-6 rounded w-96 pointer-events-auto">
+            <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
+            <p>Are you sure you want to delete this row?</p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+                onClick={() => {
+                  onDelete(rowToDelete); // Call the onDelete function
+                  setIsDeleteModalOpen(false); // Close the modal
+                }}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-700"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Table for Larger Screens */}
       <div className="overflow-x-auto hidden md:block">
         <table className="table-auto w-full border-collapse border border-gray-300 text-white">
@@ -297,7 +329,10 @@ const ReusableTable = ({
                   <td className="px-4 py-2">
                     <button
                       className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                      onClick={() => onDelete(row.id)}
+                      onClick={() => {
+                        setRowToDelete(row.id); // Set the row to delete
+                        setIsDeleteModalOpen(true); // Open the delete confirmation modal
+                      }}
                     >
                       Delete
                     </button>
@@ -317,6 +352,7 @@ const ReusableTable = ({
           </tbody>
         </table>
       </div>
+
       {/* Description modal */}
       {isDescriptionModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
@@ -520,7 +556,10 @@ const ReusableTable = ({
                 </button>
                 <button
                   className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                  onClick={() => onDelete(row.id)}
+                  onClick={() => {
+                    setRowToDelete(row.id); // Set the row to delete
+                    setIsDeleteModalOpen(true); // Open the delete confirmation modal
+                  }}
                 >
                   Delete
                 </button>
@@ -623,6 +662,7 @@ const ReusableTable = ({
           </div>
         </div>
       )}
+
       {/* Pagination Controls */}
       <div className="flex justify-center items-center gap-4 mt-4">
         <button

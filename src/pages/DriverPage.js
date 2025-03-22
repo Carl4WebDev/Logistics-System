@@ -22,6 +22,8 @@ const DriverPage = () => {
     status: "Active",
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete confirmation modal
+  const [driverToDelete, setDriverToDelete] = useState(null); // State to store the driver to delete
 
   const itemsPerPage = 5;
 
@@ -33,6 +35,7 @@ const DriverPage = () => {
 
   const handleDelete = (id) => {
     setData((prevData) => prevData.filter((item) => item.id !== id));
+    setIsDeleteModalOpen(false); // Close the delete confirmation modal
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -81,17 +84,65 @@ const DriverPage = () => {
         </button>
       </div>
 
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
+          <div className="bg-white p-6 rounded w-96 pointer-events-auto">
+            <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
+            <p>Are you sure you want to delete this driver?</p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+                onClick={() => handleDelete(driverToDelete)}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-700"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
           <div className="bg-white p-6 rounded w-96 pointer-events-auto">
             <h2 className="text-lg font-bold mb-4">Edit Driver</h2>
-
             <input
               type="text"
               placeholder="Name"
               value={selectedDriver?.name || ""}
               onChange={(e) =>
                 setSelectedDriver({ ...selectedDriver, name: e.target.value })
+              }
+              className="border border-gray-300 p-2 w-full mb-2"
+            />
+            <input
+              type="text"
+              placeholder="License Number"
+              value={selectedDriver?.licenseNumber || ""}
+              onChange={(e) =>
+                setSelectedDriver({
+                  ...selectedDriver,
+                  licenseNumber: e.target.value,
+                })
+              }
+              className="border border-gray-300 p-2 w-full mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Vehicle Assigned"
+              value={selectedDriver?.vehicleAssigned || ""}
+              onChange={(e) =>
+                setSelectedDriver({
+                  ...selectedDriver,
+                  vehicleAssigned: e.target.value,
+                })
               }
               className="border border-gray-300 p-2 w-full mb-2"
             />
@@ -108,18 +159,29 @@ const DriverPage = () => {
             >
               <option value="">Select Vehicle</option>
               <option value="Truck 1">Truck 1</option>
-              <option value="Sedan 2">Sedan 2</option>
+              <option value="Jetplane 2">Jetplane 2</option>
             </select>
-
+            <select
+              value={selectedDriver?.status || ""}
+              onChange={(e) =>
+                setSelectedDriver({
+                  ...selectedDriver,
+                  status: e.target.value,
+                })
+              }
+              className="border border-gray-300 p-2 w-full mb-2"
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
               onClick={handleSave}
             >
               Save
             </button>
-
             <button
-              className="bg-gray-400 text-white px-4 py-2 rounded ml-2"
+              className="bg-gray-400 text-white px-4 py-2 rounded ml-2 hover:bg-gray-700"
               onClick={() => setIsModalOpen(false)}
             >
               Cancel
@@ -128,8 +190,71 @@ const DriverPage = () => {
         </div>
       )}
 
+      {/* Add Driver Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
+          <div className="bg-white p-6 rounded w-96 pointer-events-auto">
+            <h2 className="text-lg font-bold mb-4">Add New Driver</h2>
+            <input
+              type="text"
+              placeholder="Name"
+              value={newDriver.name}
+              onChange={(e) =>
+                setNewDriver({ ...newDriver, name: e.target.value })
+              }
+              className="border border-gray-300 p-2 w-full mb-2"
+            />
+            <input
+              type="text"
+              placeholder="License Number"
+              value={newDriver.licenseNumber}
+              onChange={(e) =>
+                setNewDriver({ ...newDriver, licenseNumber: e.target.value })
+              }
+              className="border border-gray-300 p-2 w-full mb-2"
+            />
+            <select
+              value={newDriver.vehicleAssigned}
+              onChange={(e) =>
+                setNewDriver({
+                  ...newDriver,
+                  vehicleAssigned: e.target.value,
+                })
+              }
+              className="border border-gray-300 p-2 w-full mb-2"
+            >
+              <option value="">Select Vehicle</option>
+              <option value="Truck 1">Truck 1</option>
+              <option value="Jetplane 2">Jetplane 2</option>
+            </select>
+            <select
+              value={newDriver.status}
+              onChange={(e) =>
+                setNewDriver({ ...newDriver, status: e.target.value })
+              }
+              className="border border-gray-300 p-2 w-full mb-2"
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded"
+              onClick={handleAddDriver}
+            >
+              Add
+            </button>
+            <button
+              className="bg-gray-400 text-white px-4 py-2 rounded ml-2"
+              onClick={() => setIsAddModalOpen(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Table for Larger Screens */}
       <div className="overflow-x-auto">
-        {/* Table for Larger Screens */}
         <table className="hidden md:table table-auto w-full border-collapse border border-gray-300 text-white">
           <thead>
             <tr>
@@ -176,7 +301,10 @@ const DriverPage = () => {
                 <td className="px-4 py-2 text-center">
                   <button
                     className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                    onClick={() => handleDelete(row.id)}
+                    onClick={() => {
+                      setDriverToDelete(row.id); // Set the driver to delete
+                      setIsDeleteModalOpen(true); // Open the delete confirmation modal
+                    }}
                   >
                     Delete
                   </button>
@@ -185,151 +313,6 @@ const DriverPage = () => {
             ))}
           </tbody>
         </table>
-
-        {/* Edit modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
-            <div className="bg-white p-6 rounded w-96 pointer-events-auto">
-              <h2 className="text-lg font-bold mb-4">Edit Driver</h2>
-              <input
-                type="text"
-                placeholder="Name"
-                value={selectedDriver?.name || ""}
-                onChange={(e) =>
-                  setSelectedDriver({ ...selectedDriver, name: e.target.value })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              />
-              <input
-                type="text"
-                placeholder="License Number"
-                value={selectedDriver?.licenseNumber || ""}
-                onChange={(e) =>
-                  setSelectedDriver({
-                    ...selectedDriver,
-                    licenseNumber: e.target.value,
-                  })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              />
-              <input
-                type="text"
-                placeholder="Vehicle Assigned"
-                value={selectedDriver?.vehicleAssigned || ""}
-                onChange={(e) =>
-                  setSelectedDriver({
-                    ...selectedDriver,
-                    vehicleAssigned: e.target.value,
-                  })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              />
-
-              <select
-                value={selectedDriver?.vehicleAssigned || ""}
-                onChange={(e) =>
-                  setSelectedDriver({
-                    ...selectedDriver,
-                    vehicleAssigned: e.target.value,
-                  })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              >
-                <option value="">Select Vehicle</option>
-                <option value="Truck 1">Truck 1</option>
-                <option value="Jetplane 2">Jetplane 2</option>{" "}
-                {/* Add if needed */}
-              </select>
-              <select
-                value={selectedDriver?.status || ""}
-                onChange={(e) =>
-                  setSelectedDriver({
-                    ...selectedDriver,
-                    status: e.target.value,
-                  })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-                onClick={handleSave}
-              >
-                Save
-              </button>
-              <button
-                className="bg-gray-400 text-white px-4 py-2 rounded ml-2 hover:bg-gray-700"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-
-        {isAddModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
-            <div className="bg-white p-6 rounded w-96 pointer-events-auto">
-              <h2 className="text-lg font-bold mb-4 ">Add New Driver</h2>
-              <input
-                type="text"
-                placeholder="Name"
-                value={newDriver.name}
-                onChange={(e) =>
-                  setNewDriver({ ...newDriver, name: e.target.value })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              />
-              <input
-                type="text"
-                placeholder="License Number"
-                value={newDriver.licenseNumber}
-                onChange={(e) =>
-                  setNewDriver({ ...newDriver, licenseNumber: e.target.value })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              />
-              <select
-                value={newDriver.vehicleAssigned}
-                onChange={(e) =>
-                  setNewDriver({
-                    ...newDriver,
-                    vehicleAssigned: e.target.value,
-                  })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              >
-                <option value="">Select Vehicle</option>
-                <option value="Truck 1">Truck 1</option>
-                <option value="Jetplane 2">Jetplane 2</option>
-              </select>
-              <select
-                value={newDriver.status}
-                onChange={(e) =>
-                  setNewDriver({ ...newDriver, status: e.target.value })
-                }
-                className="border border-gray-300 p-2 w-full mb-2"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-              <button
-                className="bg-green-500 text-white px-4 py-2 rounded"
-                onClick={handleAddDriver}
-              >
-                Add
-              </button>
-              <button
-                className="bg-gray-400 text-white px-4 py-2 rounded ml-2"
-                onClick={() => setIsAddModalOpen(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Column Display for Small Screens */}
         <div className="md:hidden flex flex-col gap-4">
@@ -366,7 +349,10 @@ const DriverPage = () => {
                 </button>
                 <button
                   className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                  onClick={() => handleDelete(row.id)}
+                  onClick={() => {
+                    setDriverToDelete(row.id); // Set the driver to delete
+                    setIsDeleteModalOpen(true); // Open the delete confirmation modal
+                  }}
                 >
                   Delete
                 </button>

@@ -67,7 +67,7 @@ const AuthPage = () => {
 
     // Create new user object
     const newUser = {
-      fullName,
+      fullName, // Include fullName
       email,
       phoneNumber,
       role,

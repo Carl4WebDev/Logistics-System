@@ -1,20 +1,47 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   // Mock user data (replace with your actual backend logic)
   const [mockUsers, setMockUsers] = useState([
-    { email: "admin@example.com", password: "admin123", role: "admin" },
     {
+      id: 1, // Add unique IDs for users
+      email: "admin@example.com",
+      password: "admin123",
+      role: "admin",
+      fullName: "Admin User",
+    },
+    {
+      id: 2,
       email: "coordinator@example.com",
       password: "coordinator123",
       role: "coordinator",
+      fullName: "Coordinator User",
     },
-    { email: "driver@example.com", password: "driver123", role: "driver" },
+    {
+      id: 3,
+      email: "driver@example.com",
+      password: "driver123",
+      role: "driver",
+      fullName: "Driver User",
+    },
   ]);
 
-  const [user, setUser] = useState(null); // Current logged-in user
+  // Current logged-in user (persisted in localStorage)
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  // Update localStorage whenever the user changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   // Login function
   const login = (email, password) => {
@@ -38,12 +65,28 @@ export const AuthProvider = ({ children }) => {
     }
 
     // Add the new user to the mockUsers array
-    setMockUsers((prevUsers) => [...prevUsers, newUser]);
+    const userWithId = { ...newUser, id: mockUsers.length + 1 }; // Assign a unique ID
+    setMockUsers((prevUsers) => [...prevUsers, userWithId]);
+    setUser(userWithId); // Set the newly registered user as the logged-in user
   };
 
   // Logout function
   const logout = () => {
     setUser(null); // Clear the logged-in user
+  };
+
+  // Function to update a user's role
+  const updateUserRole = (id, newRole) => {
+    setMockUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === id ? { ...user, role: newRole } : user
+      )
+    );
+  };
+
+  // Function to delete a user
+  const deleteUser = (id) => {
+    setMockUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
   };
 
   return (
@@ -54,6 +97,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        updateUserRole,
+        deleteUser,
       }}
     >
       {children}

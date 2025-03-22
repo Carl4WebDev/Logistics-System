@@ -3,6 +3,9 @@ import NavItem from "../Sidebar/NavItem";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import logiTrack from "../../assets/images/logiTrack-bg.jpg";
+
+import { NavLink } from "react-router-dom";
+
 import {
   Menu,
   X,
@@ -48,24 +51,27 @@ export default function Navbar() {
   return (
     <nav className="bg-gray-950 text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
       {/* Left Side: Logo */}
-      <div className="font-bold flex ml-2 items-center justify-between">
-        <img
-          src={logiTrack}
-          width={"50px"}
-          height={"50px"}
-          className="rounded-full"
-          alt="LogiTrack Logo"
-        />
-        <h1 className="ml-2 text-2xl">LogiTrack</h1>
+      <div>
+        <NavLink
+          to={"/dashboard"}
+          className="font-bold flex ml-2 items-center justify-between"
+        >
+          <img
+            src={logiTrack}
+            width={"50px"}
+            height={"50px"}
+            className="rounded-full"
+            alt="LogiTrack Logo"
+          />
+          <h1 className="ml-2 text-2xl">LogiTrack</h1>
+        </NavLink>
       </div>
 
-      {/* Greeting and Logout Button (Visible when user is logged in) */}
-      {user && (
+      {/* Greeting and Logout Button (Visible when user is logged in and not on mobile) */}
+      {user && !isMobile && (
         <div className="flex items-center gap-4">
           {/* Greeting */}
-          <span className="text-lg">
-            Hi, {user?.fullName || user?.username || "User"}!
-          </span>
+          <span className="text-lg">Hi, {user?.fullName || "User"}!</span>
 
           {/* Logout Button */}
           <button
@@ -90,6 +96,22 @@ export default function Navbar() {
       {/* Mobile Sidebar (Visible only on mobile when menu is open) */}
       {isMobile && menuOpen && (
         <div className="absolute top-24 left-0 w-64 bg-gray-900 h-screen p-4 text-white">
+          {/* Greeting and Logout Button inside Mobile Sidebar */}
+          {user && (
+            <div className="flex  items-center gap-4 mb-4">
+              {/* Greeting */}
+              <span className="text-lg">Hi, {user?.fullName || "User"}!</span>
+
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 px-3 py-1 rounded"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+
           <nav className="mt-4">
             <h1 className="text-2xl">Categories</h1>
             <hr />
