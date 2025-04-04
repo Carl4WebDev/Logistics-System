@@ -176,7 +176,7 @@ const SummaryPage = () => {
 
       {/* Modal for Adding New Summary */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white w-3/5 max-h-[80vh] p-6 rounded-lg overflow-y-auto">
             {/* Modal Header */}
             <div className="flex justify-between items-center mb-4">
@@ -252,7 +252,7 @@ const SummaryPage = () => {
                   }
                   className="border p-2 w-full rounded"
                 >
-                  <option value="complete">Complete</option>
+                  <option value="completed">Completed</option>
                   <option value="incomplete">Incomplete</option>
                 </select>
               </div>

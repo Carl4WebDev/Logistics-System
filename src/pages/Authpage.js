@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
+import logiTrack from "../../src/assets/images/logiTrack-bg.jpg";
+
 const AuthPage = () => {
   const { login, register, mockUsers } = useAuth(); // Get functions and mockUsers from AuthContext
   const navigate = useNavigate();
@@ -92,11 +94,20 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="fixed inset-0 top-16 flex justify-center items-center bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
-          {isLoginMode ? "Login" : "Create Your Account"}
-        </h2>
+    <div className="fixed w-full h-full z-50 inset-0 flex justify-center items-center bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
+      <div className="bg-white p-5 rounded-lg shadow-lg w-full max-w-md">
+        <div className="flex justify-center items-center">
+          <img
+            src={logiTrack}
+            width={"60px"}
+            height={"60px"}
+            className="rounded-full"
+            alt="LogiTrack Logo"
+          />
+          <h2 className="text-2xl font-bold text-center text-blue-600">
+            {isLoginMode ? "Login" : "Create Your Account"}
+          </h2>
+        </div>
 
         {/* Display error message */}
         {error && (
@@ -105,72 +116,102 @@ const AuthPage = () => {
           </div>
         )}
 
-        {/* Full Name Input (Visible only in Register mode) */}
-        {!isLoginMode && (
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        )}
-
-        {/* Email Input */}
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        {/* Phone Number Input (Visible only in Register mode) */}
-        {!isLoginMode && (
-          <input
-            type="text"
-            placeholder="Phone Number (Optional)"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        )}
-
-        {/* Password Input */}
-        <input
-          type="password"
-          placeholder="Password (Min. 6 characters)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        {/* Confirm Password Input (Visible only in Register mode) */}
-        {!isLoginMode && (
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        )}
-
-        {/* Role Selection (Visible only in Register mode) */}
-        {!isLoginMode && (
+        {/* Login Form */}
+        {isLoginMode && (
           <>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Select Role
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
+            {/* Email Input */}
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="coordinator">Coordinator</option>
-              <option value="driver">Driver</option>
-            </select>
+            />
+
+            {/* Password Input */}
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </>
+        )}
+
+        {/* Registration Form */}
+        {!isLoginMode && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Full Name Input */}
+            <div>
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Email Input */}
+            <div>
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Phone Number Input */}
+            <div>
+              <input
+                type="text"
+                placeholder="Phone Number (Optional)"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Confirm Password Input */}
+            <div>
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Role Selection */}
+            <div className="col-span-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Select Role
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="coordinator">Coordinator</option>
+                <option value="driver">Driver</option>
+              </select>
+            </div>
+          </div>
         )}
 
         {/* Login/Register Button */}

@@ -255,8 +255,8 @@ const ReusableTable = ({
                       setIsDescriptionModalOpen(true);
                     }}
                   >
-                    {row.description.length > 15
-                      ? `${row.description.slice(0, 15)}...`
+                    {row.description.length > 5
+                      ? `${row.description.slice(0, 5)}...`
                       : row.description}
                   </td>
 
@@ -286,21 +286,38 @@ const ReusableTable = ({
                             try {
                               const workbook = XLSX.read(event.target.result, {
                                 type: "array",
+                                cellDates: true, // Enable parsing dates as JavaScript Date objects
                               });
                               const sheetName = workbook.SheetNames[0];
                               const sheet = workbook.Sheets[sheetName];
-                              const jsonData = XLSX.utils.sheet_to_json(sheet);
+                              const jsonData = XLSX.utils.sheet_to_json(sheet, {
+                                raw: false,
+                              }); // Ensure dates are parsed as Date objects
 
-                              setSelectedExcelId(row.id); // Track selected file's ID
-                              setExcelTableData(jsonData); // Set data for editing
-                              setExcelFileName(row.file.name); // Set file name for editing
+                              // Format dates properly
+                              const formattedData = jsonData.map((row) => {
+                                const newRow = { ...row };
+                                Object.keys(newRow).forEach((key) => {
+                                  if (newRow[key] instanceof Date) {
+                                    // Format the date as a readable string
+                                    newRow[key] =
+                                      newRow[key].toLocaleDateString();
+                                  }
+                                });
+                                return newRow;
+                              });
+
+                              // Update state with formatted data
+                              setSelectedExcelId(row.id);
+                              setExcelTableData(formattedData);
+                              setExcelFileName(row.file.name);
                               setIsExcelModalOpen(true);
                             } catch (error) {
                               console.error("Error parsing Excel file:", error);
                             }
                           };
 
-                          reader.readAsArrayBuffer(row.file.data); // Properly read the data as an ArrayBuffer
+                          reader.readAsArrayBuffer(row.file.data);
                         }}
                       >
                         View File
@@ -377,7 +394,21 @@ const ReusableTable = ({
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg w-[90%] h-[90%] max-w-screen-lg max-h-[90vh] overflow-y-auto">
             {/* Editable File Name */}
-            <div className="mb-4">
+            <div className="flex justify-end gap-2">
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded"
+                onClick={handleSaveExcelData}
+              >
+                Save
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsExcelModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="mb-4 w-full">
               <label className="block mb-2 font-bold text-lg">File Name:</label>
               <input
                 type="text"
@@ -453,22 +484,6 @@ const ReusableTable = ({
             ) : (
               <p>No data available.</p>
             )}
-
-            {/* Buttons */}
-            <div className="flex justify-end mt-4 gap-2">
-              <button
-                className="bg-green-500 text-white px-4 py-2 rounded"
-                onClick={handleSaveExcelData}
-              >
-                Save Changes
-              </button>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded"
-                onClick={() => setIsExcelModalOpen(false)}
-              >
-                Close
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -519,13 +534,28 @@ const ReusableTable = ({
                       try {
                         const workbook = XLSX.read(event.target.result, {
                           type: "array",
+                          cellDates: true, // Enable parsing dates as JavaScript Date objects
                         });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json(sheet);
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, {
+                          raw: false,
+                        }); // Ensure dates are parsed as Date objects
+
+                        // Format dates properly
+                        const formattedData = jsonData.map((row) => {
+                          const newRow = { ...row };
+                          Object.keys(newRow).forEach((key) => {
+                            if (newRow[key] instanceof Date) {
+                              // Format the date as a readable string
+                              newRow[key] = newRow[key].toLocaleDateString();
+                            }
+                          });
+                          return newRow;
+                        });
 
                         setSelectedExcelId(row.id);
-                        setExcelTableData(jsonData);
+                        setExcelTableData(formattedData); // Use formatted data
                         setExcelFileName(row.file.name);
                         setIsExcelModalOpen(true);
                       } catch (error) {

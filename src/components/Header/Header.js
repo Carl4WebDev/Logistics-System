@@ -49,7 +49,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-gray-950 text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
+    <nav className="bg-gray-950 text-white p-6 flex justify-between items-center fixed w-full z-30 top-0">
       {/* Left Side: Logo */}
       <div>
         <NavLink

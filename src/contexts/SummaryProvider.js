@@ -33,7 +33,7 @@ export const SummaryProvider = ({ children, initialData = [] }) => {
       file: {
         name: "Sample-Data-1.xlsx",
         data: createExcelBlob([
-          { Column1: "Value1", Column2: "Value2" },
+          { Column1: "2/4/2024", Column2: "Value2" },
           { Column1: "Value3", Column2: "Value4" },
         ]), // Create an actual Excel file inside Blob
       },
