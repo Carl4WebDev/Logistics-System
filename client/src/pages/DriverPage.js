@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import ErrorModal from "../components/ErrorModal/ErrorModal";
 
 const DriverPage = () => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      name: "Alex Turner",
-      licenseNumber: "D12345",
-      vehicleAssigned: "Truck 1",
-      status: "Active",
-    },
-  ]);
+  // ... existing state ...
+  const [errorModal, setErrorModal] = useState({
+    isOpen: false,
+    message: "",
+  });
 
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,8 +22,27 @@ const DriverPage = () => {
     status: "Active",
   });
   const [searchTerm, setSearchTerm] = useState("");
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete confirmation modal
-  const [driverToDelete, setDriverToDelete] = useState(null); // State to store the driver to delete
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [driverToDelete, setDriverToDelete] = useState(null);
+
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/drivers");
+        if (!response.ok) {
+          throw new Error("Failed to fetch drivers");
+        }
+        const drivers = await response.json();
+        setData(drivers);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchDrivers();
+  }, []);
 
   const itemsPerPage = 5;
 
@@ -33,9 +52,22 @@ const DriverPage = () => {
     )
   );
 
-  const handleDelete = (id) => {
-    setData((prevData) => prevData.filter((item) => item.id !== id));
-    setIsDeleteModalOpen(false); // Close the delete confirmation modal
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/drivers/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete driver");
+      setData(data.filter((driver) => driver.id !== id)); // Update state
+      setIsDeleteModalOpen(false);
+    } catch (err) {
+      console.error("Error operation:", err);
+      setErrorModal({
+        isOpen: true,
+        message:
+          err.message || "Failed to perform operation. Please try again.",
+      });
+    }
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -45,28 +77,117 @@ const DriverPage = () => {
   const handleEdit = (driver) => {
     setSelectedDriver({
       ...driver,
-      vehicleAssigned: driver.vehicleAssigned || "", // Ensure this is set
+      vehicleAssigned: driver.vehicleAssigned || "",
     });
     setIsModalOpen(true);
   };
 
-  const handleSave = () => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === selectedDriver.id ? selectedDriver : item
-      )
-    );
-    setIsModalOpen(false);
+  const handleSave = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/drivers/${selectedDriver.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(selectedDriver),
+        }
+      );
+      if (!response.ok) throw new Error("Failed to update driver");
+      const updatedDriver = await response.json();
+      setData(
+        data.map((driver) =>
+          driver.id === updatedDriver.id ? updatedDriver : driver
+        )
+      );
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Error operation:", err);
+      setErrorModal({
+        isOpen: true,
+        message:
+          err.message || "Failed to perform operation. Please try again.",
+      });
+    }
   };
 
-  const handleAddDriver = () => {
-    const newId = data.length + 1;
-    setData([...data, { id: newId, ...newDriver }]);
-    setIsAddModalOpen(false);
+  const [formErrors, setFormErrors] = useState({
+    name: false,
+    licenseNumber: false,
+    vehicleAssigned: false,
+  });
+
+  const validateForm = () => {
+    const errors = {
+      name: !newDriver.name,
+      licenseNumber: !newDriver.licenseNumber,
+      vehicleAssigned: !newDriver.vehicleAssigned,
+    };
+    setFormErrors(errors);
+    return !Object.values(errors).some(Boolean);
   };
+
+  const handleAddDriver = async () => {
+    // Validate before submitting
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:4000/api/drivers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newDriver),
+      });
+
+      if (!response.ok) throw new Error("Failed to add driver");
+
+      const addedDriver = await response.json();
+      setData([...data, addedDriver]);
+      setIsAddModalOpen(false);
+      setNewDriver({
+        name: "",
+        licenseNumber: "",
+        vehicleAssigned: "",
+        status: "Active",
+      });
+      setFormErrors({
+        name: false,
+        licenseNumber: false,
+        vehicleAssigned: false,
+      }); // Reset errors
+    } catch (err) {
+      console.error("Error adding driver:", err);
+      setErrorModal({
+        isOpen: true,
+        message: err.message || "Failed to add driver. Please try again.",
+      });
+    }
+  };
+
+  const [vehicles, setVehicles] = useState([]);
+  // Active Vehicles
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:4000/api/vehicles-drivers"
+        );
+        if (!response.ok) throw new Error("Failed to fetch vehicles");
+        const data = await response.json();
+        setVehicles(data);
+      } catch (err) {
+        console.error("Error fetching vehicles:", err);
+      }
+    };
+    fetchVehicles();
+  }, []);
+
+  if (loading) return <div className="p-4 text-white">Loading...</div>;
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
     <div className="p-4 w-full">
+      <h2 className="text-3xl text-white font-bold">Drivers</h2>
       <div className="flex justify-end mb-4">
         <input
           type="text"
@@ -77,7 +198,7 @@ const DriverPage = () => {
         />
 
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
           onClick={() => setIsAddModalOpen(true)}
         >
           Add New Driver
@@ -158,8 +279,11 @@ const DriverPage = () => {
               className="border border-gray-300 p-2 w-full mb-2"
             >
               <option value="">Select Vehicle</option>
-              <option value="Truck 1">Truck 1</option>
-              <option value="Jetplane 2">Jetplane 2</option>
+              {vehicles.map((vehicle) => (
+                <option key={vehicle.id} value={vehicle.id}>
+                  {vehicle.plateNumber} ({vehicle.type})
+                </option>
+              ))}
             </select>
             <select
               value={selectedDriver?.status || ""}
@@ -192,51 +316,77 @@ const DriverPage = () => {
 
       {/* Add Driver Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center pointer-events-none z-50">
-          <div className="bg-white p-6 rounded w-96 pointer-events-auto">
-            <h2 className="text-lg font-bold mb-4">Add New Driver</h2>
-            <input
-              type="text"
-              placeholder="Name"
-              value={newDriver.name}
-              onChange={(e) =>
-                setNewDriver({ ...newDriver, name: e.target.value })
-              }
-              className="border border-gray-300 p-2 w-full mb-2"
-            />
-            <input
-              type="text"
-              placeholder="License Number"
-              value={newDriver.licenseNumber}
-              onChange={(e) =>
-                setNewDriver({ ...newDriver, licenseNumber: e.target.value })
-              }
-              className="border border-gray-300 p-2 w-full mb-2"
-            />
-            <select
-              value={newDriver.vehicleAssigned}
-              onChange={(e) =>
-                setNewDriver({
-                  ...newDriver,
-                  vehicleAssigned: e.target.value,
-                })
-              }
-              className="border border-gray-300 p-2 w-full mb-2"
-            >
-              <option value="">Select Vehicle</option>
-              <option value="Truck 1">Truck 1</option>
-              <option value="Jetplane 2">Jetplane 2</option>
-            </select>
-            <select
-              value={newDriver.status}
-              onChange={(e) =>
-                setNewDriver({ ...newDriver, status: e.target.value })
-              }
-              className="border border-gray-300 p-2 w-full mb-2"
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
+          <div className="bg-white p-6 rounded-lg w-96">
+            {/* ... other modal content ... */}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium">Name</label>
+              <input
+                type="text"
+                value={newDriver.name}
+                onChange={(e) =>
+                  setNewDriver({ ...newDriver, name: e.target.value })
+                }
+                className={`border p-2 w-full rounded ${
+                  formErrors.name ? "border-red-500" : ""
+                }`}
+              />
+              {formErrors.name && (
+                <p className="text-red-500 text-xs mt-1">Name is required</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium">
+                License Number
+              </label>
+              <input
+                type="text"
+                value={newDriver.licenseNumber}
+                onChange={(e) =>
+                  setNewDriver({ ...newDriver, licenseNumber: e.target.value })
+                }
+                className={`border p-2 w-full rounded ${
+                  formErrors.licenseNumber ? "border-red-500" : ""
+                }`}
+              />
+              {formErrors.licenseNumber && (
+                <p className="text-red-500 text-xs mt-1">
+                  License number is required
+                </p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium">
+                Vehicle Assigned
+              </label>
+              <select
+                value={newDriver.vehicleAssigned}
+                onChange={(e) =>
+                  setNewDriver({
+                    ...newDriver,
+                    vehicleAssigned: e.target.value,
+                  })
+                }
+                className={`border p-2 w-full rounded ${
+                  formErrors.vehicleAssigned ? "border-red-500" : ""
+                }`}
+              >
+                <option value="">Select Vehicle</option>
+                {vehicles.map((vehicle) => (
+                  <option key={vehicle.id} value={vehicle.id}>
+                    {vehicle.plateNumber} ({vehicle.type})
+                  </option>
+                ))}
+              </select>
+              {formErrors.vehicleAssigned && (
+                <p className="text-red-500 text-xs mt-1">
+                  Vehicle assignment is required
+                </p>
+              )}
+            </div>
             <button
               className="bg-green-500 text-white px-4 py-2 rounded"
               onClick={handleAddDriver}
@@ -252,7 +402,6 @@ const DriverPage = () => {
           </div>
         </div>
       )}
-
       {/* Table for Larger Screens */}
       <div className="overflow-x-auto">
         <table className="hidden md:table table-auto w-full border-collapse border border-gray-300 text-white">
@@ -361,6 +510,12 @@ const DriverPage = () => {
           ))}
         </div>
       </div>
+      {/* Add the ErrorModal at the end */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+        errorMessage={errorModal.message}
+      />
 
       {/* Pagination Controls */}
       <div className="flex justify-center items-center gap-4 mt-4">

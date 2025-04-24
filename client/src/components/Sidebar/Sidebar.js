@@ -16,6 +16,11 @@ import {
   Folder,
   IdCard,
   UserCheck,
+  LocateIcon,
+  ArrowBigRightDash,
+  Clock,
+  Camera,
+  History,
 } from "lucide-react";
 import NavItem from "./NavItem";
 import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
@@ -38,14 +43,14 @@ export default function Sidebar() {
   if (isMobile) return null;
 
   return (
-    <div className="flex mt-20 ">
+    <div className="flex mt-20">
       {/* Sidebar */}
       <div
         className={`${
           isOpen ? "w-64" : "w-16"
-        } bg-gray-950  h-auto text-white transition-all duration-300 ease-in-out fixed p-2`}
+        } bg-gray-950  h-auto text-white transition-all duration-300 ease-in-out fixed p-2 `}
       >
-        <div className="flex items-center justify-between p-4 border-b border-gray-700 ">
+        <div className="flex items-center justify-between p-4 border-b border-gray-700 h-16 flex-shrink-0 ">
           <h1 className={`text-2xl font-bold ${!isOpen && "hidden"}`}>
             Categories
           </h1>
@@ -58,7 +63,7 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="mt-4">
+        <nav className="mt-4 overflow-y-auto flex-1">
           <ul className="space-y-2">
             {/* Dashboard */}
             <NavItem
@@ -119,9 +124,49 @@ export default function Sidebar() {
                     )}
                     {user?.role === "admin" && (
                       <NavItem
+                        to="/dispatch-output"
+                        icon={<ArrowBigRightDash className="w-4 h-4" />}
+                        text="Dispatch Output"
+                        isOpen={isOpen}
+                      />
+                    )}
+                    {user?.role === "admin" && (
+                      <NavItem
+                        to="/delivery-forwards"
+                        icon={<Clock className="w-4 h-4" />}
+                        text="Delivery Forwards"
+                        isOpen={isOpen}
+                      />
+                    )}
+                    {user?.role === "admin" && (
+                      <NavItem
+                        to="/item-snapshot"
+                        icon={<Camera className="w-4 h-4" />}
+                        text="Item Snapshot"
+                        isOpen={isOpen}
+                      />
+                    )}
+                    {user?.role === "admin" && (
+                      <NavItem
+                        to="/item-activity-logs"
+                        icon={<History className="w-4 h-4" />}
+                        text="Item Activity Logs"
+                        isOpen={isOpen}
+                      />
+                    )}
+                    {user?.role === "admin" && (
+                      <NavItem
                         to="/vehicle"
                         icon={<TruckIcon className="w-4 h-4" />}
                         text="Vehicle"
+                        isOpen={isOpen}
+                      />
+                    )}
+                    {user?.role === "admin" && (
+                      <NavItem
+                        to="/routes"
+                        icon={<LocateIcon className="w-4 h-4" />}
+                        text="Routes"
                         isOpen={isOpen}
                       />
                     )}

@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  Outlet,
 } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -15,116 +16,92 @@ import CustomersPage from "./pages/CustomersPage";
 import VehiclePage from "./pages/VehiclePage";
 import EmployeePage from "./pages/EmployeePage";
 import DriverPage from "./pages/DriverPage";
-import AuthPage from "./pages/Authpage"; // Replace LoginPage and RegisterPage with AuthPage
+import AuthPage from "./pages/Authpage";
+import RoutesPage from "./pages/RoutesPage";
 import ProtectedRoute from "../src/components/ProctectedRoute/ProtectedRoute";
 import { AuthProvider } from "../src/contexts/AuthContext";
 import { CustomersProvider } from "../src/contexts/CustomersProvider";
 import { SummaryProvider } from "../src/contexts/SummaryProvider";
 import { ShipmentsProvider } from "../src/contexts/ShipmentsProvider";
+import { DispatchOutputProvider } from "./contexts/DispatchOutputProvider";
+import { DeliveryForwardProvider } from "./contexts/DeliveryForwardProvider ";
+import { ItemSnapshotProvider } from "./contexts/ItemSnapshotProvider";
+import { ItemActivityLogProvider } from "./contexts/ItemActivityLogProvider";
 import Accounts from "./pages/Accounts";
+import DispatchOutputPage from "./pages/DispatchOutputPage";
+import DeliveryForwardPage from "./pages/DeliveryForwardPage";
+import ItemSnapshotPage from "./pages/ItemSnapshotPage";
+import ItemActivityLogPage from "./pages/ItemActivityLogPage";
 
-const Layout = ({ children }) => (
-  <div className="w-full h-screen">
-    <Header />
-    <div className="grid grid-cols-12">
-      <div className="hidden md:block md:col-span-2">
-        <Sidebar />
-      </div>
-      <div className="col-span-12 md:col-span-10">
-        <main className="h-full mt-24 flex justify-start m-2">{children}</main>
+// Layout for authenticated routes
+const MainLayout = () => {
+  return (
+    <div className="w-full h-screen">
+      <Header />
+      <div className="grid grid-cols-12">
+        <div className="hidden md:block md:col-span-2 z-50">
+          <Sidebar />
+        </div>
+        <div className="col-span-12 md:col-span-10">
+          <main className="h-full mt-24 flex justify-start m-2 z-0">
+            <Outlet />
+          </main>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 function App() {
   return (
-    <Layout>
-      <Routes>
-        {/* Auth Page (Combined Login + Register) */}
-        <Route path="/auth" element={<AuthPage />} />
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/" element={<Navigate to="/auth" replace />} />
 
-        {/* Default Route (Redirect to Auth Page) */}
-        <Route path="/" element={<Navigate to="/auth" replace />} />
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<MainLayout />}>
+          {/* Available to all authenticated users */}
+          <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute
-              element={<DashboardPage />}
-              allowedRoles={["admin", "coordinator", "driver"]}
+          {/* Admin-only routes */}
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+            <Route path="/report" element={<ReportPage />} />
+            <Route path="/customers" element={<CustomersPage />} />
+            <Route path="/vehicle" element={<VehiclePage />} />
+            <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/employee" element={<EmployeePage />} />
+            <Route path="/accounts" element={<Accounts />} />
+            <Route path="/dispatch-output" element={<DispatchOutputPage />} />
+            <Route
+              path="/delivery-forwards"
+              element={<DeliveryForwardPage />}
             />
-          }
-        />
-        <Route
-          path="/report"
-          element={
-            <ProtectedRoute element={<ReportPage />} allowedRoles={["admin"]} />
-          }
-        />
-        <Route
-          path="/shipments"
-          element={
-            <ProtectedRoute
-              element={<ShipmentsPage />}
-              allowedRoles={["admin", "coordinator"]}
+            <Route path="/item-snapshot" element={<ItemSnapshotPage />} />
+            <Route
+              path="/item-activity-logs"
+              element={<ItemActivityLogPage />}
             />
-          }
-        />
-        <Route
-          path="/summary"
-          element={
-            <ProtectedRoute
-              element={<SummaryPage />}
-              allowedRoles={["admin", "coordinator"]}
-            />
-          }
-        />
-        <Route
-          path="/customers"
-          element={
-            <ProtectedRoute
-              element={<CustomersPage />}
-              allowedRoles={["admin"]}
-            />
-          }
-        />
-        <Route
-          path="/vehicle"
-          element={
-            <ProtectedRoute
-              element={<VehiclePage />}
-              allowedRoles={["admin"]}
-            />
-          }
-        />
-        <Route
-          path="/employee"
-          element={
-            <ProtectedRoute
-              element={<EmployeePage />}
-              allowedRoles={["admin"]}
-            />
-          }
-        />
-        <Route
-          path="/driver"
-          element={
-            <ProtectedRoute
-              element={<DriverPage />}
-              allowedRoles={["admin", "driver"]}
-            />
-          }
-        />
-        <Route
-          path="/accounts"
-          element={
-            <ProtectedRoute element={<Accounts />} allowedRoles={["admin"]} />
-          }
-        />
-      </Routes>
-    </Layout>
+          </Route>
+
+          {/* Admin & Coordinator routes */}
+          <Route
+            element={<ProtectedRoute allowedRoles={["admin", "coordinator"]} />}
+          >
+            <Route path="/shipments" element={<ShipmentsPage />} />
+            <Route path="/summary" element={<SummaryPage />} />
+          </Route>
+
+          {/* Admin & Driver routes */}
+          <Route
+            element={<ProtectedRoute allowedRoles={["admin", "driver"]} />}
+          >
+            <Route path="/driver" element={<DriverPage />} />
+          </Route>
+        </Route>
+      </Route>
+    </Routes>
   );
 }
 
@@ -135,7 +112,15 @@ export default function AppWrapper() {
         <CustomersProvider>
           <ShipmentsProvider>
             <SummaryProvider>
-              <App />
+              <DispatchOutputProvider>
+                <DeliveryForwardProvider>
+                  <ItemSnapshotProvider>
+                    <ItemActivityLogProvider>
+                      <App />
+                    </ItemActivityLogProvider>
+                  </ItemSnapshotProvider>
+                </DeliveryForwardProvider>
+              </DispatchOutputProvider>
             </SummaryProvider>
           </ShipmentsProvider>
         </CustomersProvider>

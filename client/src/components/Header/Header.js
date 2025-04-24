@@ -23,6 +23,11 @@ import {
   Folder,
   IdCard,
   UserCheck,
+  LocateIcon,
+  ArrowBigRightDash,
+  Clock,
+  Camera,
+  History,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -177,12 +182,52 @@ export default function Navbar() {
                         />
                       )}
 
+                      {user?.role === "admin" && (
+                        <NavItem
+                          to="/dispatch-output"
+                          icon={<ArrowBigRightDash className="w-4 h-4" />}
+                          text="Dispatch Output"
+                          isOpen={true}
+                        />
+                      )}
+                      {user?.role === "admin" && (
+                        <NavItem
+                          to="/delivery-forwards"
+                          icon={<Clock className="w-4 h-4" />}
+                          text="Delivery Forwards"
+                          isOpen={true}
+                        />
+                      )}
+                      {user?.role === "admin" && (
+                        <NavItem
+                          to="/item-snapshot"
+                          icon={<Camera className="w-4 h-4" />}
+                          text="Item Snapshot"
+                          isOpen={true}
+                        />
+                      )}
+                      {user?.role === "admin" && (
+                        <NavItem
+                          to="/item-activity-logs"
+                          icon={<History className="w-4 h-4" />}
+                          text="Item Activity Logs"
+                          isOpen={true}
+                        />
+                      )}
                       {/* Vehicle (Visible only to admin) */}
                       {user?.role === "admin" && (
                         <NavItem
                           to="/vehicle"
                           icon={<TruckIcon className="w-4 h-4" />}
                           text="Vehicle"
+                          isOpen={true}
+                        />
+                      )}
+                      {user?.role === "admin" && (
+                        <NavItem
+                          to="/routes"
+                          icon={<LocateIcon className="w-4 h-4" />}
+                          text="Routes"
                           isOpen={true}
                         />
                       )}

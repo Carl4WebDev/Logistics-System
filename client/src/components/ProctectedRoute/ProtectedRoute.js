@@ -1,22 +1,26 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { Navigate, Outlet } from "react-router-dom";
 
-const ProtectedRoute = ({ element, allowedRoles }) => {
-  const { user } = useAuth(); // Get the current user from AuthContext
+const ProtectedRoute = ({ allowedRoles, redirectPath = "/auth" }) => {
+  const { user } = useAuth();
 
-  // If user is not logged in, redirect to login page
-  if (!user) {
-    return <Navigate to="/" replace />;
+  // If no specific roles required, just check authentication
+  if (!allowedRoles) {
+    return user ? <Outlet /> : <Navigate to={redirectPath} replace />;
   }
 
-  // If user's role is not allowed, redirect to a default page (e.g., dashboard)
+  // If user doesn't exist
+  if (!user) {
+    return <Navigate to={redirectPath} replace />;
+  }
+
+  // If user exists but doesn't have required role
   if (!allowedRoles.includes(user.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // If user is authorized, render the element
-  return element;
+  // If all checks pass
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

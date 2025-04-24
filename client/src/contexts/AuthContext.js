@@ -3,97 +3,147 @@ import React, { createContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Mock user data (replace with your actual backend logic)
-  const [mockUsers, setMockUsers] = useState([
-    {
-      id: 1, // Add unique IDs for users
-      email: "admin@example.com",
-      password: "admin123",
-      role: "admin",
-      fullName: "Admin User",
-    },
-    {
-      id: 2,
-      email: "coordinator@example.com",
-      password: "coordinator123",
-      role: "coordinator",
-      fullName: "Coordinator User",
-    },
-    {
-      id: 3,
-      email: "driver@example.com",
-      password: "driver123",
-      role: "driver",
-      fullName: "Driver User",
-    },
-  ]);
-
-  // Current logged-in user (persisted in localStorage)
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  // Update localStorage whenever the user changes
+  const [role, setRole] = useState(() => {
+    const storedRole = localStorage.getItem("role");
+    return storedRole ? JSON.parse(storedRole) : null;
+  });
+
+  const [usersData, setUsersData] = useState([]);
+
+  useEffect(() => {
+    const fetchShipments = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/users"); // Your API endpoint
+        const data = await response.json();
+        setUsersData(data);
+      } catch (err) {
+        console.error("Failed to load shipments:", err);
+      }
+    };
+
+    fetchShipments();
+  }, []);
+
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("role", JSON.stringify(user.role));
     } else {
       localStorage.removeItem("user");
+      localStorage.removeItem("role");
     }
   }, [user]);
 
-  // Login function
-  const login = (email, password) => {
-    const matchedUser = mockUsers.find(
-      (user) => user.email === email && user.password === password
-    );
+  const login = async (email, password) => {
+    try {
+      const response = await fetch("http://localhost:4000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (matchedUser) {
-      setUser(matchedUser); // Set the logged-in user
-    } else {
-      throw new Error("Invalid email or password.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      setUser(data.user);
+      setRole(data.user.role);
+      return data.user;
+    } catch (err) {
+      console.error("Login error:", err);
+      throw new Error(err.message || "Invalid email or password");
     }
   };
 
-  // Register function
-  const register = (newUser) => {
-    // Check if the email is already registered
-    const userExists = mockUsers.some((user) => user.email === newUser.email);
-    if (userExists) {
-      throw new Error("An account with this email already exists.");
-    }
+  const register = async (newUser) => {
+    try {
+      const response = await fetch("http://localhost:4000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
 
-    // Add the new user to the mockUsers array
-    const userWithId = { ...newUser, id: mockUsers.length + 1 }; // Assign a unique ID
-    setMockUsers((prevUsers) => [...prevUsers, userWithId]);
-    setUser(userWithId); // Set the newly registered user as the logged-in user
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+      setUsersData((prevUsers) => [...prevUsers, data.user]); // Add this line
+      setUser(data.user);
+      setRole(data.user.role);
+      return data.user;
+    } catch (err) {
+      console.error("Registration error:", err);
+      throw err;
+    }
   };
 
-  // Logout function
   const logout = () => {
-    setUser(null); // Clear the logged-in user
+    setUser(null);
+    setRole(null);
   };
 
-  // Function to update a user's role
-  const updateUserRole = (id, newRole) => {
-    setMockUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === id ? { ...user, role: newRole } : user
-      )
-    );
+  // In your AuthContext.js
+  const updateUserRole = async (userId, newRole) => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/users/secrets/${userId}/role`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            // Removed Authorization header
+          },
+          body: JSON.stringify({ role: newRole }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update role");
+      }
+
+      setUsersData((prevUsers) =>
+        prevUsers.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+      );
+    } catch (err) {
+      console.error("Role update failed:", err);
+      throw err;
+    }
   };
 
-  // Function to delete a user
-  const deleteUser = (id) => {
-    setMockUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-  };
+  const deleteUser = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/users/secrets/${userId}`,
+        {
+          method: "DELETE",
+          // Removed Authorization header
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+
+      setUsersData((prevUsers) => prevUsers.filter((u) => u.id !== userId));
+    } catch (err) {
+      console.error("Deletion failed:", err);
+      throw err;
+    }
+  };
   return (
     <AuthContext.Provider
       value={{
+        usersData,
         user,
-        mockUsers,
+        role,
         login,
         register,
         logout,
